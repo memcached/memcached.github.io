@@ -76,5 +76,5 @@ The `-S` flag does a few things things:
 
 ### Further Info
 
-Read more about memcached's [[SASL auth protocol|SASLAuthProtocol]].
+Read more about memcached's [SASL auth protocol](/SASLAuthProtocol).
 https://github.com/memcached/memcached/wiki/ReleaseNotes145#sasl_pwdb-for-more-simple-auth-deployments

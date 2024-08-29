@@ -34,7 +34,7 @@ When setting up memcached for the first time, you should pay attention to `-m`, 
 `-v` controls verbosity to STDOUT/STDERR. Multiple `-v`'s increase verbosity. A single one prints extra startup information, and multiple will print increasingly verbose information about requests hitting memcached. If you're curious to see if a test script is doing what you expect it to, running memcached in the foreground with a few verbose switches is a good idea.
 
 Most of the defaults are sensible. New features are often released as
-non-default options. Keep an eye on the [[ReleaseNotes]] for new options to
+non-default options. Keep an eye on the [ReleaseNotes](/ReleaseNotes) for new options to
 try.
 
 ## Init Scripts

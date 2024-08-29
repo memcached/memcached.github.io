@@ -14,10 +14,10 @@ kilobytes of a dump are about to be flushed.
 
 Also improves the ergonomics of proxy configurations via start arguments.
 
-Please see the [[1.6.25 Release Notes|ReleaseNotes1625]] for a recent
+Please see the [1.6.25 Release Notes](/ReleaseNotes1625) for a recent
 significant improvement to Extstore.
 
-See [[Proxy]] for details and quick start guides on the internal Proxy.
+See [Proxy](/Proxy) for details and quick start guides on the internal Proxy.
 
 ### Fixes
 

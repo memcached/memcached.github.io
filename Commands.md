@@ -25,7 +25,7 @@
 
 Memcached handles a small number of basic commands.
 
-Full documentation can be found in the [[Protocol Documentation|Protocols]].
+Full documentation can be found in the [Protocol Documentation](/Protocols).
 
 ### Standard Protocol
 

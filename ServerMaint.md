@@ -81,7 +81,7 @@ information.
 
 ### Troubleshooting Client Timeouts
 
-See [[Timeouts]] for help.
+See [Timeouts](/Timeouts) for help.
 
 ## Stats for Application Health
 

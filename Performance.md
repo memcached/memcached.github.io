@@ -23,7 +23,7 @@ On a fast machine with very high speed networking, memcached can easily handle 2
 
 ### It Should Not Hang
 
-Memcached operations are almost all O(1). Connecting to it and issuing a get or stat command should never lag. If connecting lags, you may be hitting the max connections limit. See [[ServerMaint|NewServerMaint]] for details on stats to monitor.
+Memcached operations are almost all O(1). Connecting to it and issuing a get or stat command should never lag. If connecting lags, you may be hitting the max connections limit. See [ServerMaint](/NewServerMaint) for details on stats to monitor.
 
 If issuing commands lags, you can have a number of tuning problems. Most common are hardware problems, not enough RAM (swapping), network problems (bandwidth, dropped packets, half-duplex connections). On rare occasion OS bugs or memcached bugs can contribute.
 

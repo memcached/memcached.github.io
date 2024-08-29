@@ -1273,7 +1273,7 @@ Touch is used to set a new expiration time for an existing item. GAT (Get and to
 
 Memcache has few authentication and no security layers whatsoever. It is RECOMMENDED that memcache be deployed strictly on closed, protected, back-end networks within a single data center, within a single cluster of servers, or even on a single host, providing shared caching for multiple applications. Memcache MUST NOT be made available on a public network.
 
-See [[SASL Authentication|SASLAuthProtocol]] for more information on
+See [SASL Authentication](/SASLAuthProtocol) for more information on
 authentication.
 
 ## Normative References

@@ -55,11 +55,11 @@ Various timeouts, including timeouts while waiting for a connection to establish
 
 ### Mutations
 
-Standard mutations as listed in [[Commands|NewCommands]]
+Standard mutations as listed in [Commands](/NewCommands)
 
 ### Get
 
-Standard fetch commands as listed in [[Commands|NewCommands]]
+Standard fetch commands as listed in [Commands](/NewCommands)
 
 ### Multi-Get
 

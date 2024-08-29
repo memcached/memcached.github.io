@@ -48,7 +48,7 @@ responses please take note. We regret the error.
 
 ### New Features
 
-See the [[Proxy wiki page|Proxy]] page for updates to the proxy API.
+See the [Proxy wiki page](/Proxy) page for updates to the proxy API.
 
 ### Contributors
 

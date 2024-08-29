@@ -25,7 +25,7 @@ This does not provide encryption, but can provide authentication. Do not run
 this over the internet large, do use this to protect from neighbors and
 accidents from within large mostly trusted networks.
  
-This page mostly exists to describe the protocol.  If you just want to use it, check out the [[SASL howto|SASLHowto]]
+This page mostly exists to describe the protocol.  If you just want to use it, check out the [SASL howto](/SASLHowto)
 
 ## Authentication Concepts
  
@@ -112,6 +112,6 @@ Authentication Step | 0x22 | Mechanism | Auth Data |
 
 ## See Also
  
-[[memcached SASL howto|SASLHowto]]
+[memcached SASL howto](/SASLHowto)
 
 http://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer

@@ -29,7 +29,7 @@ Without compiling in extstore, almost no new changes since 1.5.3.
 extstore, a cleverly named external storage shim, is an addon for using flash
 drives to expand cache storage.
 
-For more detail, see the [[Extstore]] page. If this page is low on details,
+For more detail, see the [Extstore](/Extstore) page. If this page is low on details,
 check back as it will be periodically updated.
 
 A short summary:
@@ -59,7 +59,7 @@ It can, or should, work in many scenarios. Since only older, colder items end
 up on flash, you can use SSD-backed VM's and reduce the money you spend on RAM
 caches. This will vary by use case.
 
-See [[Extstore]] for full discussion on the tradeoffs. Please find us on the
+See [Extstore](/Extstore) for full discussion on the tradeoffs. Please find us on the
 mailing list if you have any questions.
 
 ### Contributors

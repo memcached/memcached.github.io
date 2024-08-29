@@ -137,14 +137,14 @@ Roadmapped features:
 
 # Examples and use cases
 
-See [[this document on example architectures|ProxyExamples]] for
+See [this document on example architectures](/ProxyExamples) for
 different methods of deploying and using the proxy.
 
 ---
 
 # Architecture and Workflows
 
-See [[this document on architecture|ProxyArch]] for details on the proxy's
+See [this document on architecture](/ProxyArch) for details on the proxy's
 thread components and how various subsystems work.
 
 ---
@@ -872,10 +872,10 @@ request objects:
 removed. This can be used, for example, to see or replace the TTL part of a SET
 request.
 - `request:vlen()`: length in bytes of the value attached to this request
-- `request:has_flag('F')`: for use with [[meta|MetaCommands]], a fast function
+- `request:has_flag('F')`: for use with [meta](/MetaCommands), a fast function
   for testing if a flag exists in the request string.
 - `request:flag_token("F", "Freplacement")`: for use with
-  [[meta|MetaCommands]], a fast function for finding and modifying a request
+  [meta](/MetaCommands), a fast function for finding and modifying a request
 line. Returns `(exists, previous_token)`, a bool on if the flag exists, and if
 the flag has a token attached it will be returned in `previous_token`. If a
 second argument is passed, it will be used to replace the flag and/or token
@@ -888,7 +888,7 @@ response objects:
   from the original request.
 - `resp:ok()`: whether a request was successfully executed to the backend.
   For GET requests, both HIT and MISS are OK.
-- `resp:line()`: for use with [[meta|MetaCommands]], returns the full
+- `resp:line()`: for use with [meta](/MetaCommands), returns the full
   response header line.
 - `resp:code()`: the response code. Common codes are:
   - `mcp.MCMC_CODE_OK`

@@ -80,13 +80,13 @@ See [Timeouts] for help.
 
 ### How do I authenticate?
 
-You don't! Well, you used to not be able to. [[Now you can|SASLHowto]]. If your client supports it, you may use SASL authentication to connect to memcached.
+You don't! Well, you used to not be able to. [Now you can](/SASLHowto). If your client supports it, you may use SASL authentication to connect to memcached.
 
 Keep in mind that you should do this only if you really need to. On a closed internal network this ends up just being added latency for new connections (if minor).
 
 ### How do you handle failover?
 
-You don't. Some clients have a "failover" option that will try the next server in the case of a failure. As noted in [[Configuring Clients|NewConfiguringClient]] this isn't always the best idea.
+You don't. Some clients have a "failover" option that will try the next server in the case of a failure. As noted in [Configuring Clients](/NewConfiguringClient) this isn't always the best idea.
 
 ### How do you handle replication?
 
@@ -94,7 +94,7 @@ It doesn't. Adding replication to the system halves your effective cache size. I
 
 ### Can you persist cache between restarts?
 
-Yes, in some situations. See [[the documentation on warm restart|WarmRestart]].
+Yes, in some situations. See [the documentation on warm restart](/WarmRestart).
 
 ### Do clients and servers all need to talk to each other?
 

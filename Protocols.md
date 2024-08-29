@@ -4,13 +4,13 @@ time. The Meta protocol is more efficient than the binary protocol, is cross
 compatible with the Text protocol, and is recommended for all new clients.
 
  * [Text and Meta Protocol](http://github.com/memcached/memcached/blob/master/doc/protocol.txt)
- * [[Meta Examples|MetaCommands]]
- * [[Binary Protocol|BinaryProtocolRevamped]]
+ * [Meta Examples](/MetaCommands)
+ * [Binary Protocol](/BinaryProtocolRevamped)
    * [Slides on binary protocol ](http://www.slideshare.net/tmaesaka/memcached-binary-protocol-in-a-nutshell-presentation/) by Toru Maesaka (2008)
 
 Further, there are sub protocols and proposals
 
- * [[SASL Authentication|SASLAuthProtocol]]
+ * [SASL Authentication](/SASLAuthProtocol)
 
 ## Why is the binary protocol deprecated?
 
