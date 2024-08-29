@@ -9,13 +9,13 @@
 - [Reducing key size](#reducing-key-size)
 - [Accelerating counters safely](#accelerating-counters-safely)
 - [Rate limiting](#rate-limiting)
-- [Ghetto central locking](#ghetto-central-locking)
+- [Loose central locking](#loose-central-locking)
 - [Avoiding stampeding herd](#avoiding-stampeding-herd)
-    - [Ghetto lock](#ghetto-lock)
+    - [Loose lock](#loose-lock)
     - [Outside mutex](#outside-mutex)
     - [Scaling expiration](#scaling-expiration)
     - [Gearmand or similar](#gearmand-or-similar)
-- [Ghetto replication](#ghetto-replication)
+- [Loose replication](#loose-replication)
 - ["Touching" keys with `add`](#touching-keys-with-add)
 
 <!-- end toc -->
@@ -141,11 +141,11 @@ TODO: This is a memcached/mysql hybrid for avoiding running `count(*) from table
 
 TODO: There were a couple decent posts on this. I've seen some slides that were buggy. Need to round them up.
 
-### Ghetto central locking
+### Loose central locking
 
-While we don't recommend doing this for any "serious" locking situation, sometimes you would benefit from an advisory, sometimes reliable "lock" obtainable via memcached.
+While we don't recommend doing this for any serious locking situation, sometimes you would benefit from an advisory, sometimes reliable "lock" obtainable via memcached.
 
-Given a cache item that is popular and difficult to recreate, you could end up with dozens (or hundreds) of processes slamming your database at the same time in an attempt to refill a cache. Discussed more below as the "stampeding herd" problem, we'll describe a simple method of using `add` to create an advisory "ghetto lock"
+Given a cache item that is popular and difficult to recreate, you could end up with dozens (or hundreds) of processes slamming your database at the same time in an attempt to refill a cache. Discussed more below as the "stampeding herd" problem, we'll describe a simple method of using `add` to create an advisory "loose lock"
 
 ```
 key  = "expensive_frontpage_item"
@@ -177,7 +177,7 @@ Use at your own risk! 'add' can fail because the key already exists, or because 
 
 It's a big problem when cache misses on hot (or expensive) items cause a mess of application processes to slam your database for answers. There are a large array of choices one has to avoid this problem, and we'll discuss a few below.
 
-#### Ghetto lock
+#### Loose lock
 
 As shown above, in a pinch you can reduce the odds of needing to run the query by using memcached's `add` feature.
 
@@ -210,7 +210,7 @@ In the case of a syncronous update, gearmand can coalesce incoming jobs with the
 
 Very handy.
 
-### Ghetto replication
+### Loose replication
 
 Some clients may natively support replication. It will pick two unique servers to store a value on, and either linearly or randomly retrieve the value again. Sometimes you don't have this feature!
 
