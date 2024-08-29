@@ -4,8 +4,8 @@ Your friendly neighborhood memory cache daemon.
 
 ### About
 
- * [[Overview]]
- * [[Release Notes|ReleaseNotes]]
+ * [Overview](/Overview)
+ * [Release Notes](/ReleaseNotes)
 
 * Communication
  * [Mailing List](http://groups.google.com/group/memcached)
@@ -13,43 +13,43 @@ Your friendly neighborhood memory cache daemon.
 
 ### Getting Started
 
- * [[Installing|Install]]
- * [[Tutorial (in fun story form!)|TutorialCachingStory]]
- * [[Hardware Recommendations|Hardware]]
+ * [Installing](/Install)
+ * [Tutorial (in fun story form!)](/TutorialCachingStory)
+ * [Hardware Recommendations](/Hardware)
 
 ### Configuration
 
- * [[Configuring a Server|ConfiguringServer]]
- * [[Configuring a Client|ConfiguringClient]]
- * [[Builtin proxy|Proxy]]
- * [[External flash storage|Extstore]]
- * [[TLS support|TLS]]
- * [[Restarting without losing cache|WarmRestart]]
+ * [Configuring a Server](/ConfiguringServer)
+ * [Configuring a Client](/ConfiguringClient)
+ * [Builtin proxy](/Proxy)
+ * [External flash storage](/Extstore)
+ * [TLS support](/TLS)
+ * [Restarting without losing cache](/WarmRestart)
 
 ### User Notes
 
- * [[Tuning Grafana Loki with Extstore|ConfiguringLokiExtstore]]
+ * [Tuning Grafana Loki with Extstore](/ConfiguringLokiExtstore)
 
 ### Usage
 
- * [[Clients]]
- * [[API Commands|Commands]]
- * [[New Expanded Meta API Commands|MetaCommands]]
- * [[Common Client Features|CommonFeatures]]
- * [[Programming With Memcached Basics|Programming]]
- * [[Memcached Usage FAQ|ProgrammingFAQ]]
- * [[HOWTO's and Tricks|ProgrammingTricks]]
- * [[Memcached Internals for End Users|UserInternals]]
+ * [Clients](/Clients)
+ * [API Commands](/Commands)
+ * [New Expanded Meta API Commands](/MetaCommands)
+ * [Common Client Features](/CommonFeatures)
+ * [Programming With Memcached Basics](/Programming)
+ * [Memcached Usage FAQ](/ProgrammingFAQ)
+ * [HOWTO's and Tricks](/ProgrammingTricks)
+ * [Memcached Internals for End Users](/UserInternals)
 
 ### Maintenance
 
- * [[Maintaining a Server|ServerMaint]]
- * [[Maintaining a Cluster|ClusterMaint]]
- * [[What Performance To Expect|Performance]]
- * [[DDOS attacks on old open servers|DDOS]]
- * [[Troubleshooting Timeouts|Timeouts]]
+ * [Maintaining a Server](/ServerMaint)
+ * [Maintaining a Cluster](/ClusterMaint)
+ * [What Performance To Expect](/Performance)
+ * [DDOS attacks on old open servers](/DDOS)
+ * [Troubleshooting Timeouts](/Timeouts)
 
 ### Development
 
- * [[Development Repos|DevelopmentRepos]]
- * [[Protocols]]
+ * [Development Repos](/DevelopmentRepos)
+ * [Protocols](/Protocols)
