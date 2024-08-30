@@ -1,3 +1,5 @@
+{% include mermaid.html %}
+
 ## Contents
 
 - [Memcached Proxy Architecture and Workflows](#memcached-proxy-architecture-and-workflows)
