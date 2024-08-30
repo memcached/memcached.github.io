@@ -16,12 +16,7 @@
 
 <!-- end toc 3 -->
 
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    mermaid.initialize({ startOnLoad: true });
-  });
-</script>
+{% include mermaid.html %}
 
 # Memcached Proxy Architecture and Workflows
 
