@@ -35,6 +35,8 @@
 
 <!-- end toc 3 -->
 
+{% include mermaid.html %}
+
 # Memcached Builtin Proxy
 
 ## What is it?
@@ -153,7 +155,7 @@ thread components and how various subsystems work.
 
 To load the configuration, a dedicated thread first compiles the Lua code. It then calls the function `mcp_config_pools`, which loads all backends, collects them into pools, and returns a Lua table holding all of the final pool objects. Next, for each worker thread, they each execute `mcp_config_routes`. This function is expected to set up route handling (code that matches requests to a pool), and sets the command hooks that memcached will call (ie; hooks on get, set, and so on).
 
-```mermaid
+<pre class="mermaid">
 ---
 title: Loading Configuration
 ---
@@ -169,7 +171,7 @@ flowchart TD
     C2["Run mcp.attach(CMD, handler)"]
     end
     configure --> |for each worker: copy lua code and config table|worker
-```
+</pre>
 
 The proxy flow starts by parsing a request (ie: `get foo`) and looking for a function hook for this command. If a hook exists, it will call the supplied function. If no hook exists, it will handle the request as though it were a normal memcached.
 
@@ -374,7 +376,7 @@ _all_ enqueued requests are immediately executed.
 This means if you enqueue two requests, then queue and wait on a third, all
 three requests are batched and executed simultaneously.
 
-```mermaid
+<pre class="mermaid">
 ---
 title: enqueue all at once
 ---
@@ -384,9 +386,9 @@ flowchart TD
     C -->|request| D[backend]
     C -->|request| E[backend]
     C -->|request| F[backend]
-```
+</pre>
 
-```mermaid
+<pre class="mermaid">
 ---
 title: enqueue in stages
 ---
@@ -396,6 +398,7 @@ flowchart TD
     C -->|request| D[backend]
     C -->|request| E[backend]
 ```
+</pre>
 
 ### Where is the results table?
 
