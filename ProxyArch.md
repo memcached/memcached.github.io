@@ -1,4 +1,3 @@
-{% include mermaid.html %}
 
 ## Contents
 
@@ -17,9 +16,13 @@
 
 <!-- end toc 3 -->
 
+{% include mermaid.html %}
+
 # Memcached Proxy Architecture and Workflows
 
 ## Client connections and workers
+
+Testing.
 
 Client connections to the proxy are handled exactly the same as a normal
 memcached. A dedicated thread listens for new sockets, and distributes client
