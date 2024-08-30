@@ -35,7 +35,7 @@ There are no dedicated "proxy" worker threads. A worker thread may handle
 cache responses or proxy requests. Lua for request handling is _only executed
 in a worker thread_.
 
-```mermaid
+<pre class="mermaid">
 ---
 title: Client socket handling
 ---
@@ -44,7 +44,7 @@ flowchart LR
     Accept -->|round robin| Worker1[Worker thread]
     Accept -->|round robin| Worker2[Worker thread]
     Accept -->|round robin| Worker3[Worker thread]
-```
+</pre>
 
 ## Backend requests and connections
 
