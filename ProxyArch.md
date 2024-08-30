@@ -52,7 +52,7 @@ Backend requests may either come directly from a worker thread (if `iothread =
 false` in pool settings). Each worker thread has a dedicated TCP connection to
 each backend server.
 
-```mermaid
+<pre class="mermaid">
 flowchart TD         
     subgraph worker2
     direction LR                                                                                                                         
@@ -66,7 +66,7 @@ flowchart TD
     Worker2 <--> Backend12[Backend server]
     Worker2 <--> Backend13[Backend server]
     end
-```
+</pre>
 
 Or, if `iothread = true`, workers will submit requests to a dedicated IO
 thread, which will batch up requests to the same backend if possible. In this
@@ -75,14 +75,14 @@ mode we will use fewer total TCP sockets.
 This IO thread does not contain any Lua processing, it is pure C and only
 handles the networking and protocol parsing on response data.
 
-```mermaid
+<pre class="mermaid">
 flowchart LR
     Worker1[Worker thread] <--> IO{IO thread}
     Worker2[Worker thread] <--> IO
     IO <--> Backend1[Backend server]
     IO <--> Backend2[Backend server]
     IO <--> Backend3[Backend server]
-```
+</pre>
 
 ## Configuration load and reload
 
@@ -96,12 +96,12 @@ The load process runs against one worker thread at a time. First, because the
 configuration thread has to copy some data into each worker, and second to
 minimize the latency impact of reload.
 
-```mermaid
+<pre class="mermaid">
 flowchart LR
     Config{Configuration thread} -->|first| Worker1[Worker thread]
     Config -->|second| Worker2[Worker thread]
     Config -->|third| Worker3[Worker thread]
-```
+</pre>
 
 ---
 
@@ -154,7 +154,7 @@ backends are roughly the same speed: memcached does not typically do
 processing before returning results, so all requests take the same amount of
 time. In most cases performance is acceptable.
 
-```mermaid
+<pre class="mermaid">
 sequenceDiagram
     Participant Client
     Participant Proxy Worker
@@ -167,7 +167,7 @@ sequenceDiagram
     Backend->>Proxy Worker: 3x VALUE etc\r\n
     Note right of Proxy Worker: Ready to respond to Client
     Proxy Worker->>Client: 3x VALUE etc\r\n
-```
+</pre>
 
 ### Batching backend requests
 
@@ -246,7 +246,7 @@ Basically:
 
 # Request flow
 
-```mermaid
+<pre class="mermaid">
 flowchart TD
     A["get foo/username"] -->B["is there a get hook?"]
     B --> |yes|C[check map for a 'foo' func]
@@ -265,7 +265,7 @@ flowchart TD
     N --> M 
     M --> O[response received from remote mc]
     O --> P["VALUE etc response sent to client"]
-```
+</pre>
 
 Almost all of the actual processing is done outside of Lua, with Lua used to primarily manage configuration as code.
 

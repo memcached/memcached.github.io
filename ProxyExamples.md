@@ -15,6 +15,8 @@
 
 <!-- end toc 3 -->
 
+{% include mermaid.html %}
+
 # Memcached Proxy Deployments
 
 The memcached proxy is a flexible and lightweight system with few
@@ -25,16 +27,16 @@ This allows us to adjust easily based on application requirements.
 
 ## Proxy Middleware Machine
 
-```mermaid
+<pre class="mermaid">
 flowchart TD
     A[Application] -->|memcached protocol|B
     B{Memcached Proxy}
     B -->D[Memcached]
     B -->E[Memcached]
     B -->F[Memcached]
-```
+</pre>
 
-```mermaid
+<pre class="mermaid">
 flowchart TD
     A[Application] -->|memcached protocol|B
     B{Memcached Proxy} -->foo1
@@ -49,7 +51,7 @@ subgraph bar1 [key prefix 'bar/']
     BN2[memcached]
     BN3[memcached]
 end
-```
+</pre>
 
 ### Middleware Architecture
 
@@ -145,7 +147,7 @@ servers.
 
 ## Application Sidecar
 
-```mermaid
+<pre class="mermaid">
 flowchart TD
 subgraph app [Application Host]
   App[Application] -->|simplified memcached protocol| Prox{Memcached Proxy}
@@ -162,7 +164,7 @@ subgraph bar [key prefix 'bar/']
   BN2[memcached]
   BN3[memcached]
 end
-```
+</pre>
 
 ### Sidecar Architecture
 
@@ -206,7 +208,7 @@ because "container systems" can add significant overhead.
 
 ## Cache Layering Proxy
 
-```mermaid
+<pre class="mermaid">
 flowchart TD
   App[Application] --> foo
 subgraph foo [cache pool]
@@ -220,7 +222,7 @@ subgraph rem [remote pool]
   R2[memcached]
   R3[memcached]
 end
-```
+</pre>
 
 ### Cache Layering Architecture
 
