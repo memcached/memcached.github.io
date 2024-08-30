@@ -16,6 +16,7 @@ Your friendly neighborhood memory cache daemon.
  * [Installing](/Install)
  * [Tutorial (in fun story form!)](/TutorialCachingStory)
  * [Hardware Recommendations](/Hardware)
+ * [Builtin Proxy Quickstart](/proxy/quickstart)
 
 ### Configuration
 
