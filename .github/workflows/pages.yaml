@@ -57,7 +57,7 @@ jobs:
         run: |
           hugo \
             --gc --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/"
+            --baseURL "https://${{ github.repository_owner }}.github.io/"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
