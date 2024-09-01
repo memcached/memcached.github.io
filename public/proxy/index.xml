@@ -1,0 +1,19 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>My New Hugo Site – Builtin Proxy</title>
+    <link>http://localhost:1313/proxy/</link>
+    <description>Recent content in Builtin Proxy on My New Hugo Site</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 01 Sep 2024 09:05:37 -0700</lastBuildDate>
+    
+	  <atom:link href="http://localhost:1313/proxy/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+  </channel>
+</rss>

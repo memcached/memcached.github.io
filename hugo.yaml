@@ -1,0 +1,8 @@
+baseURL: https://example.org/
+languageCode: en-us
+title: My New Hugo Site
+theme: hextra
+menu:
+  main:
+    - name: Home
+      url: "https://www.memcached.org/"
