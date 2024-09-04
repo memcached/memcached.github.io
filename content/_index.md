@@ -17,6 +17,8 @@ See the [memcached.org about page](http://memcached.org/about) for a brief overv
 
 Memcached is a developer tool, not a "code accelerator", nor is it database middleware. If you're trying to set up an application you have downloaded or purchased to use memcached, read your app's documentation. This wiki and community will not be able to help you.
 
+Want a gentle introduction to the core concepts? [Check out this storybook like tutorial](/tutorialcachingstory/)
+
 ### What is it Made Up Of?
 
  * Client software, which is given a list of available memcached servers.
