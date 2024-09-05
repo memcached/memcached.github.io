@@ -15,8 +15,7 @@ relies on looking at all keys to then render a page will eventually fail.
 
 You can use the `lru crawler` to examine all keys in an instance. This
 interface provides useful data for doing an analysis on data that is stored in
-a cache. See [the protocol
-documentation](Protocol](http://github.com/memcached/memcached/blob/master/doc/protocol.txt))
+a cache. See [the protocol documentation](https://github.com/memcached/memcached/blob/master/doc/protocol.txt))
 for full info.
 
 ### Why only RAM?
@@ -54,7 +53,7 @@ See [Timeouts](/troubleshooting/timeouts) for help.
 
 ### How do I authenticate?
 
-Limited password based authentication is available in [the basic protocol](http://github.com/memcached/memcached/blob/master/doc/protocol.txt) - You can also enable TLS and authenticate by certificates verification.
+Limited password based authentication is available in [the basic protocol](https://github.com/memcached/memcached/blob/master/doc/protocol.txt) - You can also enable TLS and authenticate by certificates verification.
 
 ### How do you handle failover?
 
