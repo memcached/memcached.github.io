@@ -6,3 +6,9 @@ menu:
   main:
     - name: Home
       url: "https://www.memcached.org/"
+
+# Render HTML elements within Markdown source files
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
