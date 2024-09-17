@@ -1,9 +1,8 @@
 +++
-title = 'Quickstart'
+title = 'Built-in proxy quickstart'
 date = 2024-09-01T09:30:55-07:00
+weight = 10
 +++
-
-# Built-in Proxy Quickstart
 
 This page helps you get familiar with the Memcached built-in proxy by guiding you through the following tasks:
 
@@ -12,7 +11,7 @@ This page helps you get familiar with the Memcached built-in proxy by guiding yo
 * Set up a minimal proxy configuration file that lets the proxy use two Memcached servers as its backend.
 * Run this proxy-based Memcached architecture, and observe the proxy at work by connecting to it and querying it.
 
-For detailed documentation about the Memcached built-in proxy, see [Proxy](/Proxy).
+For detailed documentation about the Memcached built-in proxy, see [Proxy](({{<legacy_proxy_base_path>}})).
 
 ## Before you begin
 
@@ -43,9 +42,9 @@ Because the Memcached built-in proxy is a non-default, compile-time configuratio
 1. Unzip and untar the tarball, then change your working directory to the source directory:
 
     ```posix-terminal
-    tar xzvf memcached-VERSION.tar.gz
+    tar xzvf memcached-{{<var>}}VERSION{{</var>}}.tar.gz
     
-    cd memcached-VERSION
+    cd memcached-{{<var>}}VERSION{{</var>}}
     ```
     
     Replace <var>`VERSION`</var> with the version number in the tarball that you downloaded in the previous step.
@@ -53,7 +52,7 @@ Because the Memcached built-in proxy is a non-default, compile-time configuratio
 1. Configure the Memcached build process to enable the built-in proxy:
 
     ```
-    ./configure --with-proxy
+    ./configure --enable-proxy
     ```
     
 1. Build and test Memcached:
@@ -167,6 +166,3 @@ If you want to keep the Memcached software that you built with the proxy feature
 
 You also have the option of rebuilding the `memcached` binary with different configuration options. For more information, run the command `./configure --help` from within the Memcached source directory.
 
-## Next steps
-
-For more information about running the proxy, including all ways that you can define its behavior using a Lua-based configuration file, see [Proxy](/Proxy).
