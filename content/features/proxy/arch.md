@@ -175,7 +175,7 @@ Here we will:
   - If there is another response ready in the buffer, immediately process it.
   - Once complete, go back to waiting.
 
-If more requests arrive while Backend B is waiting for respones, it will
+If more requests arrive while Backend B is waiting for responses, it will
 immediately write() them to the same socket. If the socket buffer is full, it
 will wait until it can write more. Thus new requests are not delayed while
 waiting for a previous batch to complete.
@@ -185,7 +185,7 @@ off of the socket, so there is no internal delay for waiting on a batch to
 process.
 
 If Backend B breaks for some reason, the queue is immediately drained and
-error responses are sent to all waiting Client's.
+error responses are sent to all waiting Clients.
 
 TODO: chart.
 
