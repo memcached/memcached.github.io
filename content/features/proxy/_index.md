@@ -101,21 +101,21 @@ Roadmapped features:
 
 ---
 
-# Examples and use cases
+## Examples and use cases
 
 See [this document on example architectures](/ProxyExamples) for
 different methods of deploying and using the proxy.
 
 ---
 
-# Architecture and Workflows
+## Architecture and Workflows
 
 See [this document on architecture](/ProxyArch) for details on the proxy's
 thread components and how various subsystems work.
 
 ---
 
-# Configuration API
+## Configuration API {#configuration_api}
 
 To load the configuration, a dedicated thread first compiles the Lua code. It then calls the function `mcp_config_pools`, which loads all backends, collects them into pools, and returns a Lua table holding all of the final pool objects. Next, for each worker thread, they each execute `mcp_config_routes`. This function is expected to set up route handling (code that matches requests to a pool), and sets the command hooks that memcached will call (ie; hooks on get, set, and so on).
 
