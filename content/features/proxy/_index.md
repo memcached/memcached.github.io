@@ -101,21 +101,21 @@ Roadmapped features:
 
 ---
 
-# Examples and use cases
+## Examples and use cases
 
 See [this document on example architectures](/ProxyExamples) for
 different methods of deploying and using the proxy.
 
 ---
 
-# Architecture and Workflows
+## Architecture and Workflows
 
 See [this document on architecture](/ProxyArch) for details on the proxy's
 thread components and how various subsystems work.
 
 ---
 
-# Configuration API
+## Configuration API {#configuration_api}
 
 To load the configuration, a dedicated thread first compiles the Lua code. It then calls the function `mcp_config_pools`, which loads all backends, collects them into pools, and returns a Lua table holding all of the final pool objects. Next, for each worker thread, they each execute `mcp_config_routes`. This function is expected to set up route handling (code that matches requests to a pool), and sets the command hooks that memcached will call (ie; hooks on get, set, and so on).
 
@@ -733,7 +733,7 @@ function generator(rctx)
     return function(r)
         -- could break, since we are now directly referencing the global
         -- table, which can change. many times this won't matter, but a best
-        -- practice is to always pass referenecs down when needed.
+        -- practice is to always pass references down when needed.
         local foo = lookup[input]
     end
 end
@@ -790,7 +790,7 @@ mcp.backend_flap_backoff_ramp(seconds)
 -- reasonable timeframe.
 mcp.backend_flap_backoff_max(seconds)
 
--- Whether or not a backend is hanndled by worker threads or a dedicated IO
+-- Whether or not a backend is handled by worker threads or a dedicated IO
 -- thread, by default.
 -- disabled by default, which provides better scalability at the cost of more
 -- TCP connections and less batching of backend syscalls.
@@ -901,7 +901,7 @@ a good number of language and performance improvements on its own.
 ## Why not use a mesh router?
 
 Memcached's proxy is not intended to replace a mesh router; its scope is much
-smaller and more performance focused. A mesh router may be highly confgurable,
+smaller and more performance focused. A mesh router may be highly configurable,
 with broad support, but will be very slow. Caching services (and in this case
 a caching proxy) can be used to restore performance to a service migrated to a
 mesh router; for cost or practicality reasons.
