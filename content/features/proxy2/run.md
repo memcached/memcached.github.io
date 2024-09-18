@@ -51,7 +51,7 @@ memcached -o proxy_config=$HOME/routelib.lua,proxy_arg=$HOME/my_config.lua -p 11
 
 ### Test the connection
 
-Once it's running, the Memcached proxy presents a network interface very similar to an ordinary Memcached server. To test that it's up and listening on the port that you expect, use `telnet` to connect to connect to that port, and try a basic command from the Memcached protocol.
+Once it's running, the Memcached proxy presents a network interface very similar to an ordinary Memcached server. To test that it's up and listening on the port that you expect, use `telnet` to connect to that port, and try a basic command from the Memcached protocol.
 
 For example, if you are running a proxy on port 11211, you can connect to the proxy directly with this command:
 
@@ -83,7 +83,7 @@ To exit this test connection follow these steps:
 
 ## Run the proxy with multiple tagged TCP ports {#tags}
 
-You can run optionally the proxy to listen on multiple TCP ports, and assign a short text-string _tag_ to each one. This lets you define multiple complete route tress in the proxy configuration file, where the proxy handles a request differently depending upon the port that the requesting client is connected to.
+You can run optionally the proxy to listen on multiple TCP ports, and assign a short text-string _tag_ to each one. This lets you define multiple complete route trees in the proxy configuration file, where the proxy handles a request differently depending upon the port that the requesting client is connected to.
 
 To specify multiple, tagged TCP ports, include the `-l` or `--listen` command-line flag once for every port, with the syntax `TAG:HOST:PORT`. You can mix untagged ports with tagged ones.
 
