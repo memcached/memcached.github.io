@@ -222,14 +222,14 @@ routes {
         cust = cmdmap{
             -- Handle only SET commands for keys with the prefix with "cust"
             set = route_direct {
-                child = { "customer_pool" },
+                child = "customer_pool",
             },
         },
     },
 
     -- Handle keys that don't have a mapped prefix.
     default = route_direct {
-        child = { "main_pool" }
+        child = "main_pool"
     },
 }
 ```
@@ -307,7 +307,7 @@ The following example excerpt from a proxy configuration file that declares a lo
 local_zone("west")
 
 pools {
-    main_pool_set = {
+    set_main_pools = {
         west   = {
             backends = {
                 "192.0.2.1",
@@ -325,7 +325,7 @@ pools {
         },
     },
     
-    customer_pool_set = {
+    set_customer_pools = {
         west   = {
             backends = {
                 "203.0.113.1",
@@ -351,17 +351,17 @@ The only route handler that makes use of zone information is [`route_zfailover`]
 routes {
     map = {
         main = route_zfailover {
-            children = "main_pool_set",
+            children = "set_main_pools",
         },
         cust = cmdmap{
             set = route_zfailover {
-                children = "customer_pool_set",
+                children = "set_customer_pools",
             },
         },
     },
 
     default = route_allfastest {
-        children = { "main_pool_set" }
+        children = { "set_main_pools" }
     },
 }
 ```
