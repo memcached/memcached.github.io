@@ -20,11 +20,9 @@ For more information, see [Install the built-in proxy]({{<proxy_base_path>}}inst
 
 ## Run the proxy
 
-{{< callout type="info" >}}This section assumes that you installed your proxy-enabled Memcached to have the default command name `memcached`. If you configured the build process to name the command something else—for example, `memcached-proxy`—then use that name here instead.{{</callout>}}
-
 To run the proxy, launch the proxy-enabled Memcached binary with the `proxy_config` and `proxy_arg` command-line options:
 
-```
+```console
 memcached -o proxy_config={{<var>}}ROUTE_LIBRARY_PATH{{</var>}},proxy_arg={{<var>}}CONFIGURATION_PATH{{</var>}} {{<var>}}FURTHER_ARGUMENTS{{</var>}}
 ```
 
@@ -40,12 +38,12 @@ To run the proxy in the background, append a `&` to the end of the command, in t
 
 The following example command launches a Memcached proxy with the following aspects:
 
-* The proxy loads a route library file named `routelib.lua` stored in your home directory.
+* The proxy loads a route library file named `routelib.lua` stored in your home directory. For more information about obtaining this file, see [Download and build the proxy]({{<proxy_base_path>}}install#download).
 * The proxy loads a configuration file named `my_config.lua` stored in your home directory.
 * The proxy listens for connections on TCP port `11212`.
 * The proxy runs in the background.
 
-```
+```console
 memcached -o proxy_config=$HOME/routelib.lua,proxy_arg=$HOME/my_config.lua -p 11212 &
 ```
 
@@ -55,7 +53,7 @@ Once it's running, the Memcached proxy presents a network interface very similar
 
 For example, if you are running a proxy on port 11211, you can connect to the proxy directly with this command:
 
-```
+```console
 telnet 11211
 ```
 
@@ -69,7 +67,7 @@ Escape character is '^]'.
 
 Request some data under an arbitrary key name such as `proxy-test`, which need not correspond to any key known by your Memcached nodes:
 
-```
+```console
 get proxy-test
 ```
 
@@ -89,7 +87,7 @@ To specify multiple, tagged TCP ports, include the `-l` or `--listen` command-li
 
 For example, the following command runs the proxy with three TCP ports active. Two of the ports are tagged `main` and `alt`, respectively, and one port has no tag associated with it:
 
-```
+```console
 memcached -o proxy_config=$HOME/routelib.lua,proxy_arg=$HOME/my_config.lua -l 127.0.0.1:11211 -l main:127.0.0.1:11212 -l alt:127.0.0.1:11213 &
 ```
 

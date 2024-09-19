@@ -52,7 +52,7 @@ Because the Memcached built-in proxy is a non-default, compile-time configuratio
 1. Configure the Memcached build process to enable the built-in proxy:
 
     ```
-    ./configure --with-proxy
+    ./configure --enable-proxy
     ```
     
 1. Build and test Memcached:

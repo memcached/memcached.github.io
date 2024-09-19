@@ -49,18 +49,10 @@ To download and compile Memcached with its proxy features enabled, follow these 
 1. Configure the Memcached build process to enable the built-in proxy:
 
     ```console
-    ./configure --with-proxy {{<var>}}OTHER_FLAGS{{</var>}}
+    ./configure --enable-proxy {{<var>}}OTHER_OPTIONS{{</var>}}
     ```
     
-    Replace <var>OTHER_FLAGS</var> with a list of any other other Memcached configuration options that you wish to enable. For a complete list of these options, run the command `./configure --help`.
-    
-    If you want to install the proxy-enabled Memcached on a file system that already has Memcached installed on it, and you want to continue using that Memcached separately from the proxy, then you can add flags to `./configure` to adjust the new binary's name or installed location. For example, the following command configures the build process to make a proxy-enabled Memcached binary named `memcached-proxy`, instead of `memcached`:
-    
-    
-    ```console
-    ./configure --with-proxy --program-suffix=-proxy {{<var>}}OTHER_FLAGS{{</var>}}
-    ```
-    
+    Replace <var>OTHER_OPTIONS</var> with a list of any other options for the `configure` command that you wish to enable. For a complete list of these options, run the command `./configure --help`.
 
 1. Build and test Memcached:
 
@@ -89,8 +81,6 @@ To download and compile Memcached with its proxy features enabled, follow these 
     ```console
     memcached --help | grep proxy
     ```
-   
-    {{< callout type="info" >}}If you configured the Memcached build process to name the binary something other than `memcached`—for example, `memcached-proxy`—then use that name in this command, instead of `memcached`.{{< /callout >}}
     
     The output resembles the following:
     
