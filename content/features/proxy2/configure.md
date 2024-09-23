@@ -3,7 +3,7 @@ title = 'Configure the built-in proxy'
 weight = 30
 +++
 
-This page is about configuring and running the Memcached built-in proxy.
+This page is about configuring the Memcached built-in proxy.
 
 For a general overview of the proxy, see [Proxy]({{<legacy_proxy_base_path>}}). For a hands-on tutorial that guides you through compiling and running the proxy with a simple configuration, see [Built-in Proxy Quickstart]({{<proxy_base_path>}}quickstart).
 
@@ -129,32 +129,70 @@ pools {
 
 ### Define proxy routes
 
-Use the required `routes{}` block to define how the proxy should handle data storage or retrieval queries. You do this by mapping a set of key-prefix strings to the pools of backend servers that you defined in the `pools{}` block.
+Use the required `routes{}` block to define how the proxy should handle data storage or retrieval queries. Generally speaking, this involves forwarding requests involving specific keys or commands to the various pools of Memcached servers that you defined in the `pools{}` section. You can use the many route handlers that the routing library provides to forward these requests in a variety of ways.
 
-For example, if you have defined a pool of Memcached nodes under the pool name `main_pool`, then you can define a route that redirects queries under keys like `main/key-12345` and `main/another-key-321` to that pool's backend servers to store or retrieve data under those keys.
+{{< callout type="info" >}}The `route{}` block has a wide range of options available, making this documentation section rather complex. For some helpful examples of the `route{}` block in action, see [Example configuration files](#examples).{{</callout>}}
 
-{{< callout type="info" >}}Pool names and key prefixes don't need to be similar in the way that `main_pool` and `main/key-12345` are. However, it can be good practice to give pools and their corresponding key prefixes similar names, for the sake of clarity.{{</callout>}}
+A `routes{}` block contains least one of the following:
 
-The `routes{}` block has the following format:
+* A `map` section that maps key prefixes to route handlers. You can pair this with an optional `conf` section for tuning how the proxy separates prefix strings out from key names.
+* A `cmap` section that maps Memcached commands to route handlers.
+* A `default` section that specifies a route handler for any requests which don't match any of the conditions in the `map` or `cmap` sections.
+
+For more information about route handlers, see [Key concepts]({{<proxy_base_path>}}#concepts).
+
+The following sections explain these configuration sections in more detail.
+
+#### The `map` section {#map}
+
+The `map` section of `routes{}` defines a list of key prefixes, mapping each one to a specific route handler. The mapping includes the names of the pools or sets that the route handler takes as arguments:
+
 
 ```lua
--- Optional: instruct the proxy how to parse key prefixes
+map = {
+    {{<var>}}KEY_PREFIX{{</var>}} = {{<var>}}HANDLER_TYPE{{</var>}}{ {{<var>}}HANDLER_ARGS{{</var>}} },
+    {{<var>}}[ ... ]{{</var>}} 
+},
+```
+
+Replace the following:
+
+* <var>KEY_PREFIX</var>: the key prefix to map to this route handler.
+    
+* <var>HANDLER_TYPE</var>: the name of a route library handler. For a list of all of the handlers available, see [Route handler reference]({{<proxy_base_path>}}reference).
+
+* <var>HANDLER_ARGS</var>: the arguments to pass to the route handler. Typically, this is where you name one or more pools. The list of arguments and their expected syntax depends on the handler type. For more information, see [Route handler reference]({{<proxy_base_path>}}reference).
+
+The following example `route{}` block configures the proxy to direct all requests for keys with the `cust` prefix, such as `cust/key-12345` and `cust/another-key-321`, to a pool named `customer_pool`. It has no `conf` section because it relies on the default prefix style.
+
+```lua
+route {
+    map = {
+        cust = route_direct {
+            child = "customer_pool",
+        },
+    },
+    
+    default = { {{<var>}}[...]{{</var>}} },
+}
+```
+
+{{< callout type="info" >}}Pool names and key prefixes don't need to be similar in the way that `customer_pool` and `cust/key-12345` are. However, it can be good practice to give pools and their corresponding key prefixes similar names, for the sake of clarity.{{</callout>}}
+
+You can further refine `map` directives to handle requests only when they match specific prefixes and Memcached commands, together. For more information, see [Restrict route handlers to certain commands]({{<proxy_base_path>}}reference#commands). 
+
+#### The `conf` section {#conf}
+
+If you define a `map` section, then you can also define an optional `conf` section, which tells the proxy how to parse key prefixes.
+
+By default the proxy reads everything in the key's name before its first `/` as its prefix. If the key has no `/` character, then the proxy handles the request with no prefix. For example, the default prefix of `cust/12345` is `cust`. You can use a `conf` section of a `route{}` block to change this behavior:
+
+```lua
 conf = {
     mode = "{{<var>}}MODE{{</var>}}",
     start = "{{<var>}}START_STRING{{</var>}}",
     stop = "{{<var>}}STOP_STRING{{</var>}}",
 },
-
--- Define one route handler for every key prefix that requires non-default
--- handling
-map = {
-    {{<var>}}KEY_PREFIX{{</var>}} = {{<var>}}HANDLER_TYPE{{</var>}}{ {{<var>}}HANDLER_ARGS{{</var>}} },
-    {{<var>}}[ ... ]{{</var>}} 
-},
-
--- Define one default router handler, as a catch-all for any prefixes not matched
--- in the map section, as well as keys with no prefixes at all
-default = {{<var>}}HANDLER_TYPE{{</var>}}{ {{<var>}}HANDLER_ARGS{{</var>}} },
 ```
 
 Replace the following:
@@ -167,15 +205,46 @@ Replace the following:
     
 * <var>START_STRING</var>: if the mode is `anchor`, then this is a substring of five or fewer characters at the start of every key name that precedes the prefix.
 
-* <var>STOP_STRING</var>: a substring that separates the prefix from the remainder of the key name.
+* <var>STOP_STRING</var>: a substring that separates the prefix from the remainder of the key name. The default is `/`.
 
-* <var>KEY_PREFIX</var>: the key prefix to map to this route handler.
-    
-* <var>HANDLER_TYPE</var>: the name of a route library handler. For a list of all of the handlers available, see [Route handler reference]({{<proxy_base_path>}}reference).
+#### The `cmap` section {#cmap}
 
-* <var>HANDLER_ARGS</var>: the arguments to pass to the route handler. Typically, this is where you name one or more pools. The list of arguments and their expected syntax depends on the handler type. For more information, see [Route handler reference]({{<proxy_base_path>}}reference).
+To have the proxy handle requests differently depending upon the Memcached command that it receives, include a `cmap` section in your `routes{}` block. For example, you can configure the proxy to direct all `get` requests to one pool, regardless of prefix, and all `set` requests to a different pool.
 
-### Example configuration files
+```lua
+cmap = {
+    {{<var>}}KEY_PREFIX{{</var>}} = {{<var>}}HANDLER_TYPE{{</var>}}{ {{<var>}}HANDLER_ARGS{{</var>}} },
+    {{<var>}}[ ... ]{{</var>}} 
+},
+```
+
+The following example `cmap` section configures the proxy to forward all `get` requests to the pools named `main-1` and `main-2`, returning data from whichever one responds first:
+
+```lua
+route {
+    cmap = {
+        get = route_allfastest{
+            children = { "main-1", "main-2" },
+        },
+    },
+
+    default = { {{<var>}}[...]{{</var>}} },
+}
+```
+
+Entries in the `cmap` configuration section match commands regardless of any associated key prefix. If you want to define router handlers that activate only when the proxy receives requests for specific key prefixes _and_ commands, then you can do that with `map` entries. For more information, see [Restrict route handlers to certain commands]({{<proxy_base_path>}}reference#commands).
+
+#### The `default` section {#default}
+
+To handle any requests that don't match any of the prefixes or commands defined in the `map` or `cmap` sections, add a `default` section. This section specifies a single route handler:
+
+```lua
+default = {{<var>}}HANDLER_TYPE{{</var>}}{ {{<var>}}HANDLER_ARGS{{</var>}} },
+```
+
+{{< callout type="warning" >}}If you don't define a `default` section within a `route{}` block, then the proxy returns an error for any requests that don't match any `map` or `cmap` sections defined in that `route{}` block.{{</callout>}}
+
+### Example configuration files {#examples}
 
 The following example file demonstrates all four of the configuration file sections described earlier on this page:
 

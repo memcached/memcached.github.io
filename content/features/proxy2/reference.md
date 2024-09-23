@@ -115,7 +115,7 @@ Replace the following:
 * <var>STATS_BOOLEAN</var>: if true, then Memcached includes a tally of failovers in the response to [the `stats proxy` command]({{<proxy_base_path>}}run/#stats).
 * <var>MISS_BOOLEAN</var>: if true, then the proxy treats both errors and missing cache data failures. Otherwise, the proxy counts only errors as failures.
 
-## Restrict route handlers to certain commands
+## Restrict route handlers to certain commands {#commands}
 
 By default, the proxy chooses a route for a request regardless of the Memcached command in that request. You can restrict routes to handle only certain Memcached commands by wrapping route handler invocations in a `cmdmap{}` call:
 
