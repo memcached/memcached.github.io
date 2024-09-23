@@ -22,7 +22,7 @@ Before you can run the proxy, you need to create a configuration that lists the 
 
 The configuration file is a Lua script that extends the standard proxy route library. Advanced users can modify the route library itself, or even replace it entirely with their own Lua code. The techniques described on this page focus on using the route library as-is, which covers the majority of Memcached proxy use-cases.
 
-### Overview of the configuration file
+### Overview of the configuration file {#overview}
 
 The configuration file has four general parts:
 
@@ -35,7 +35,7 @@ The configuration file has four general parts:
 
 The following sections detail the contents of each of the above parts, with examples.
 
-### Enable logging and debugging
+### Enable logging and debugging {#logging}
 
 To enable logging and debugging features of the proxy, include any of the following function calls at the top of the configuration file:
 
@@ -43,20 +43,20 @@ To enable logging and debugging features of the proxy, include any of the follow
 
 * `debug(1)` turns on a debugging mode that is mainly useful if you are modifying the routing library. This setting also lets you use the `dsay({{<var>}}TEXT{{</var>}})` function to print <var>TEXT</var> to standard output while loading the proxy configuration.
 
-### Adjust proxy settings
+### Adjust proxy settings {#settings}
 
-To fine-tune various proxy behaviors, include a `settings{}` block in your configuration file. The block contains any number of function calls that set values on the `mcp` object. For the full list of available setting functions, see [General API documentation]({{<legacy_proxy_base_path>}}#general-api-documentation).
+To fine-tune various proxy behaviors, include a `settings{}` block in your configuration file. The block can set new values for any of the settings listed under [Proxy settings reference]({{<proxy_base_path>}}settings-reference).
 
-For example, the following settings block sets a ten-second connection timeout, and an upper limit of five active requests:
+For example, the following `settings{}` block sets a three-second backend connection timeout, and an upper limit of five active requests:
 
 ```lua
 settings {
-    mcp.backend_connect_timeout(10)
-    mcp.active_req_limit(5)
+    backend_connect_timeout = 3,
+    active_req_limit = 5,
 }
 ```
 
-### Define backend pools
+### Define backend pools {#pools}
 
 Use the required `pools{}` block to define the locations and other attributes of the back-end Memcached servers that the router directs queries to.
 
@@ -254,7 +254,7 @@ verbose(1)
 
 -- Override a handful of default settings for proxy behavior.
 settings {
-    active_request_limit = 100,
+    backend_connect_timeout = 3,
     pool_options = {
         filter = "tags",
         filter_conf = "{}"
