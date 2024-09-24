@@ -79,6 +79,8 @@ Replace the following:
 * <var>HOST</var>: the IP address or hostname of the Memcached server you are defining as a backend.
 * <var>PORT</var>: (optional) the TCP port of the Memcached server you are defining as a backend. The default value is `11211`.
 
+{{< callout type="warning" >}}Don't start any pool name with `set_`. That name style is reserved for sets of pools. For more information, see [Define sets of pools](#sets).{{</callout>}}
+
 To fine-tune the proxy settings for an individual backend, replace its entry in the `backends` list with a curly-braced list of back-end options. The list must include `host`.
 
 The following example defines two backends, including one that runs on port 11212 and has a ten-second connection timeout:
@@ -90,22 +92,7 @@ backends = {
 }
 ```
 
-You can optionally gather pools into a named _set_, which contains a list of pool definitions. You might want to employ this technique if you have several pools of backends that you want the router to treat as mutually equivalent with synchronized data:
-
-```lua
-{{<var>}}SET_NAME{{</var>}} = {
-    {
-        { backends = {{<var>}}[ ... ]{{</var>}} },
-        { backends = {{<var>}}[ ... ]{{</var>}} },
-        {{<var>}}[ ... ]{{</var>}}
-    },
-    {{<var>}}[ ... ]{{</var>}}
-}
-```
-
-Replace <var>SET_NAME</var> with a name for this set of pools.
-
-The following example `pools{}` block defines two pools with three backends each:
+Putting things into more context, the following example `pools{}` block defines two pools with three backends each:
 
 ```lua
 pools {
@@ -126,6 +113,27 @@ pools {
     },
 }
 ```
+
+#### Define sets of pools {#sets}
+
+You can optionally gather pools into named _sets_, each of which contains a list of pool definitions. You might want to employ this technique if you have several pools of backends that you want the router to treat as mutually equivalent with synchronized data:
+
+```lua
+{{<var>}}SET_NAME{{</var>}} = {
+    {
+        { backends = {{<var>}}[ ... ]{{</var>}} },
+        { backends = {{<var>}}[ ... ]{{</var>}} },
+        {{<var>}}[ ... ]{{</var>}}
+    },
+    {{<var>}}[ ... ]{{</var>}}
+}
+```
+
+Replace <var>SET_NAME</var> with a name for this set of pools—for example, `set_customer_pools`. The name must begin with `set_`.
+
+{{< callout type="warning" >}}If you don't start a set's name with `set_`, then Memcached reads it as an ordinary pool definition, likely resulting in a syntax error.{{</callout>}}
+
+Sets are also useful when organizing pools into named zones as part of an ordered failover strategy. For more information, see [Prioritize a route using local zones](#zones).
 
 ### Define proxy routes
 
@@ -343,7 +351,7 @@ To mark the backend as online again, remove the `_down_` or `down=true` attribut
 
 ## Prioritize a route using local zones {#zones}
 
-If you have organized your pools into named sets, then you can further configure the proxy to prefer routing requests to certain pools within a set, even if other pools are available. You might want to do this to prefer routing requests to a pool that is geographically closer to the proxy, for example.
+If you have [organized your pools into named sets](#sets), then you can further configure the proxy to prefer routing requests to certain pools within a set, even if other pools are available. You might want to do this to prefer routing requests to a pool that is geographically closer to the proxy, for example.
 
 Doing this involves the following steps:
 
@@ -368,6 +376,7 @@ pools {
 
 Replace the following:
 * <var>LOCAL_ZONE_NAME</var>: the name of the zone that this proxy prefers to route requests to.
+* <var>SET_NAME</var>: the name of this set of pools—for example, `set_customer_pools`. The name must begin with `set_`.
 * <var>POOL_ZONE_NAME</var>: the name of the zone that this pool is in.
 
 The following example excerpt from a proxy configuration file that declares a local zone—in this case, "`west`"—and then defines two sets of zoned pools.
