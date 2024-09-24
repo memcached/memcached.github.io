@@ -30,7 +30,7 @@ The configuration file has four general parts:
 
 1. Optional invocations of global functions to turn on logging or debugging features.
 1. An optional `settings{}` block, which sets various proxy settings to values other than their defaults.
-1. A `pools{}` block, which defines groups of backend Memcached servers that the proxy routes queries to.
+1. One or more `pools{}` blocks, which define groups of backend Memcached servers that the proxy routes queries to.
 1. One or more `routes{}` blocks, which lay out the rules by which the proxy routes requests to the pools defined in the `pools{}` blocks.
 
     It's common to have only one `routes{}` block. If you want to have the router handle requests differently depending upon connection context, [you can define multiple `routes{}` blocks](#multiple-trees).
@@ -39,11 +39,11 @@ The following sections detail the contents of each of the above parts, with exam
 
 ### Enable logging and debugging {#logging}
 
-To enable logging and debugging features of the proxy, include any of the following function calls at the top of the configuration file:
+To enable logging and debugging features of the routing library, include any of the following function calls at the top of the configuration file:
 
-* `verbose(1)` has Memcached print additional information to standard output when loading the proxy configuration. This setting also lets you use the `say({{<var>}}TEXT{{</var>}})` function to print <var>TEXT</var> to standard output while loading your custom configuration.
+* `verbose(true)` has Memcached print additional information to standard output when loading the proxy configuration. This setting also lets you use the `say({{<var>}}TEXT{{</var>}})` function to print <var>TEXT</var> to standard output while loading your custom configuration.
 
-* `debug(1)` turns on a debugging mode that is mainly useful if you are modifying the routing library. This setting also lets you use the `dsay({{<var>}}TEXT{{</var>}})` function to print <var>TEXT</var> to standard output while loading the proxy configuration.
+* `debug(true)` turns on a debugging mode that is mainly useful if you are modifying the routing library. This setting also lets you use the `dsay({{<var>}}TEXT{{</var>}})` function to print <var>TEXT</var> to standard output while loading the proxy configuration.
 
 ### Adjust proxy settings {#settings}
 
@@ -61,6 +61,8 @@ settings {
 ### Define backend pools {#pools}
 
 Use the required `pools{}` block to define the locations and other attributes of the back-end Memcached servers that the router directs queries to.
+
+You can optionally define more than one `pools{}` block. Doing so is functionally equivalent to combining all of their contents into a single `pools{}` block. For the sake of simplicity, this documentation uses example configuration files with only one `pools{}` block.
 
 The `pools{}` block contains one or more pool definitions in the following format:
 
@@ -262,7 +264,7 @@ The following example file demonstrates all four of the configuration file secti
 
 ```lua
 -- Turn on the proxy's verbose mode.
-verbose(1)
+verbose(true)
 
 -- Override a handful of default settings for proxy behavior.
 settings {
@@ -297,8 +299,8 @@ pools {
 routes {
     map = {
         -- Handle keys that start with "main/"
-        main = route_allfastest {
-            children = { "main_pool" },
+        main = route_direct {
+            child = "main_pool",
         },
         cust = cmdmap{
             -- Handle only SET commands for keys with the prefix with "cust"
