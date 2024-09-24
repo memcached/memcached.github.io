@@ -20,7 +20,9 @@ For more information, see [Install the built-in proxy]({{<proxy_base_path>}}inst
 
 Before you can run the proxy, you need to create a configuration that lists the pools of Memcached servers that you want to use as the proxy's back end, and describes the routing trees that you want the proxy to use.
 
-The configuration file is a Lua script that extends the standard proxy route library. Advanced users can modify the route library itself, or even replace it entirely with their own Lua code. The techniques described on this page focus on using the route library as-is, which covers the majority of Memcached proxy use-cases.
+The configuration extends the standard proxy route library. It uses Lua syntax, but you don't need to know how to program in Lua to create and modify the configuration file.
+
+While advanced users can modify the route library itself, the techniques described on this page focus on using the route library as-is, which covers the majority of Memcached proxy use-cases.
 
 ### Overview of the configuration file {#overview}
 
