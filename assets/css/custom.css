@@ -1,0 +1,13 @@
+/* Custom CSS for Memcached documentation */
+
+/*******/
+/* Command-line commands: Insert a non-copyable "$ " before each commmand. */
+/* This needs two selectors to do right. */
+/*******/
+code.language-console>span:not(:empty):has(span:empty):before {
+  content: "$ ";
+}
+
+code.language-console>span:not(:has(>span>span)):before {
+  content: "$ ";
+}
