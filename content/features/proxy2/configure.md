@@ -139,6 +139,29 @@ Replace <var>SET_NAME</var> with a name for this set of pools—for example, `se
 
 {{< callout type="warning" >}}If you don't start a set's name with `set_`, then Memcached reads it as an ordinary pool definition, likely resulting in a syntax error.{{</callout>}}
 
+The following example defines one set named `set_main_pool` which contains the two pools from the previous `pools{}` example:
+
+```lua
+pools {
+    set_main_pools = {
+        { 
+            backends = {
+                "192.0.2.1",
+                "192.0.2.2",
+                "192.0.2.3:11212",
+            },
+        },
+        {
+            backends = {
+                "203.0.113.1",
+                "203.0.113.10",
+                { host = "203.0.113.20", port = 11212, connecttimeout = 10 },
+            },
+        },
+    },
+}
+```
+
 Sets are also useful when organizing pools into named zones as part of an ordered failover strategy. For more information, see [Prioritize a route using local zones](#zones).
 
 ### Define proxy routes
