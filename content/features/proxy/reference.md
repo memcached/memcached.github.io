@@ -3,7 +3,9 @@ title = 'Route handler reference'
 weight = 100
 +++
 
-This page is a reference for the route handlers provided by the standard route library of the Memcached built-in proxy. For a guide to invoking these route handlers in your proxy configuration file, see [Configure the built-in proxy]({{<proxy_base_path>}}configure).
+This page is a reference for the route handlers provided by the standard route library of the Memcached built-in proxy.
+
+For a guide to invoking these route handlers in your proxy configuration file, see [Configure the built-in proxy]({{<proxy_base_path>}}configure). For examples, see [Example configuration files]({{<proxy_base_path>}}configure#examples).
 
 ## Route handlers
 
@@ -70,7 +72,10 @@ route_split{
 }
 ```
 
-Replace <var>POOL_NAME_A</var> and <var>POOL_NAME_B</var> with the names of two different pools defined in the `pools{}` block of your proxy configuration file.
+Replace the following:
+
+* <var>POOL_NAME_A</var>: the name of a pool defined in the `pools{}` block of your proxy configuration file.
+* <var>POOL_NAME_B</var>: the name of a different pool defined in the `pools{}` block of your proxy configuration file.
 
 ### `route_ttl`
 
@@ -85,7 +90,10 @@ route_ttl{
 }
 ```
 
-Replace <var>TTL</var> with an integer representing the new TTL value.
+Replace the following:
+
+* <var>TTL</var>: an integer representing the new TTL value.
+* <var>POOL_NAME</var>: the name of a pool defined in the `pools{}` block of your configuration file.
 
 ### `route_failover`
 
