@@ -120,49 +120,7 @@ pools {
 }
 ```
 
-#### Define sets of pools {#sets}
-
-You can optionally gather pools into named _sets_, each of which contains a list of pool definitions. You might want to employ this technique if you have several pools of backends that you want the router to treat as mutually equivalent with synchronized data:
-
-```lua
-{{<var>}}SET_NAME{{</var>}} = {
-    {
-        { backends = {{<var>}}[ ... ]{{</var>}} },
-        { backends = {{<var>}}[ ... ]{{</var>}} },
-        {{<var>}}[ ... ]{{</var>}}
-    },
-    {{<var>}}[ ... ]{{</var>}}
-}
-```
-
-Replace <var>SET_NAME</var> with a name for this set of pools—for example, `set_customer_pools`. The name must begin with `set_`.
-
-{{< callout type="warning" >}}If you don't start a set's name with `set_`, then Memcached reads it as an ordinary pool definition, likely resulting in a syntax error.{{</callout>}}
-
-The following example defines one set named `set_main_pool` which contains the two pools from the previous `pools{}` example:
-
-```lua
-pools {
-    set_main_pools = {
-        { 
-            backends = {
-                "192.0.2.1",
-                "192.0.2.2",
-                "192.0.2.3:11212",
-            },
-        },
-        {
-            backends = {
-                "203.0.113.1",
-                "203.0.113.10",
-                { host = "203.0.113.20", port = 11212, connecttimeout = 10 },
-            },
-        },
-    },
-}
-```
-
-Sets are also useful when organizing pools into named zones as part of an ordered failover strategy. For more information, see [Prioritize a route using local zones](#zones).
+You can optionally define named sets of pools within the `pools{}` block, as well as individual, named pools. For more information, see [Gather related pools into sets](#sets).
 
 ### Define proxy routes
 
@@ -377,6 +335,71 @@ If you have defined the backend using the alternate list-based syntax, then add 
 ```
 
 To mark the backend as online again, remove the `_down_` or `down=true` attribute from the backend's definition in the proxy configuration file.
+
+## Gather related pools into sets {#sets}
+
+Any route handler that requires a list of pools among its arguments lets you alternately specify a _set_ of pools, instead. You define sets in the `pools{}` section of your configuration file using the following syntax:
+
+```lua
+{{<var>}}SET_NAME{{</var>}} = {
+    {
+        { {{<var>}}POOL_DEFINITION{{</var>}} },
+        {{<var>}}[ ... ]{{</var>}}
+    },
+}
+```
+
+Replace the following:
+
+* <var>SET_NAME</var>: the name for this set of pools—for example, `set_customer_pools`. The name must begin with `set_`.
+
+    {{< callout type="warning" >}}If you don't start a set's name with `set_`, then Memcached reads it as an ordinary pool definition, likely resulting in a syntax error.{{</callout>}}
+
+* <var>POOL_DEFINITION</var>: a complete, "anonymous" [pool definition](#pools)—that is, it has no pool name attached.
+
+    In the simplest case, the definition is `backends = { {{<var>}}[ ... ]{{</var>}} }`, defining a list of the pool's backends.
+
+The following example defines one set named `set_main_pools`, which contains three backends. The example then uses that set to create a [failover route]({{<proxy_base_path>}}reference#route_failover):
+
+```lua
+pools {
+    set_main_pools = {
+        { 
+            backends = {
+                "192.0.2.1",
+                "192.0.2.2",
+                "192.0.2.3:11212",
+            },
+        },
+        {
+            backends = {
+                "203.0.113.1",
+                "203.0.113.10",
+                { host = "203.0.113.20", port = 11212, connecttimeout = 10 },
+            },
+        },
+    },
+}
+
+routes {
+    route_failover {
+        children = "set_main_pools",
+        shuffle  = true,
+    },
+}
+```
+
+When passing arguments to route handlers, the following actions are functionally equivalent:
+
+* Passing a list of pool names to a route handler—for example:
+
+    `route_allsync{ children = { "main_pool_1", "main_pool_2" } }`
+
+* Passing a single set name to a route handler—for example:
+
+    `route_allsync{ children = "set_main_pools" }`
+    
+Choose the technique that makes the most sense for your use case, in terms of the legibility and maintainability of your configuration file.
 
 ## Prioritize a route using local zones {#zones}
 
