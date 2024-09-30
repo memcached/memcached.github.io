@@ -48,16 +48,16 @@ The core elements of the proxy's configuration are pools and <em>routes</em>. Ea
 
 * A mapping between some contextual criteria around a received Memcached command and a pool of backends. For example, a route might map all keys whose key has the prefix `cust/` to the pool named `customer_pool`.
 
-* A _route handler_, one of several defined by the route library. Each router handler tells the proxy which backend pools to forward a request to, and in what style or order. For example, given a list of backend pools, different route handlers can forward requests to those pools in parallel, or serially, and optionally randomize the list first.
+* A _route handler_, one of several defined by the route library. Each route handler tells the proxy which backend pools to forward a request to, and in what style or order. For example, given a list of backend pools, different route handlers can forward requests to those pools either in parallel or serially, and optionally randomize the list first.
 
-For more information on defining pools and routes, see [Configure the built-in proxy]({{<proxy_base_path>}}configure)
+For more information on defining pools and routes, see [Configure the built-in proxy]({{<proxy_base_path>}}configure).
 </dd>
 
 <dt>Route library</dt>
 <dd>
-The Memcached project includes a <em>route library</em> file that you can download separately. The route library is a Lua source file that defines basic routing functions for defining pools, routes, and route handlers.
+The Memcached project includes a <em>route library</em> file that you can download separately. The route library is a Lua source file that provides basic routing functions that let you define pools, routes, and route handlers.
 
-The route library exists as a Lua source file on the file system used by your proxy. In typical proxy use, you let the proxy load the route library file as-is, with no changes. In more complex use cases, you can freely modify or replace this library file using your own Lua code.
+In typical proxy use, you let the proxy load the route library file as-is, with no changes. In more complex cases, you can freely modify or replace this library file using your own Lua code.
 </dd>
 </dl>
 
@@ -65,13 +65,13 @@ The route library exists as a Lua source file on the file system used by your pr
 
 The Memcached proxy uses various criteria to decide which of its known backends that it should forward data storage or retrieval requests to. These criteria can include the following:
 
-* A prefix on the requested key name. For example, you can configure the router to send requests for the key `data/12345` to one pool of back-end servers, and requests for the key `cust/12345` to a different pool. Requests with no prefix or an unrecognized prefix can be handled by a designated default pool.
+* **Key prefix.** For example, you can configure the router to send requests for the key `data/12345` to one pool of back-end servers, and requests for the key `cust/12345` to a different pool. Requests with no prefix or an unrecognized prefix can be handled by a designated default pool.
 
     You can configure the proxy to recognize various shapes of prefixes, with different lead-in or separator characters between the prefix and the main key name. For example, if your application's cache keys look more like `--cust//12345` than `cust/12345`, you can still configure the proxy to recognize the former case as having the prefix `cust`.
 
-* The TCP port that the client has connected to the proxy. For example, you can configure the proxy to listen on TCP ports `11211` and `11212`, and route requests differently depending upon the connected port.
+* **TCP port.** For example, you can configure the proxy to listen on TCP ports `11211` and `11212`, and route requests differently depending upon the connected port.
 
-* Specific route handlers invoked by the configuration file. For example, say that you configure the proxy to call the route handler `route_allsync{}`, with a list of three pools, every time it receives a cache request for a key with the prefix `cust`. In that case, a request to store data under `cust/12345-abcd` will be sent in parallel to all three pools that you named in the `route_allsync{}` call in the proxy configuration file, in the definition of the `cust` route.
+* **Route handler arguments.** For example, say that you configure the proxy to call the route handler `route_allsync{}`, with a list of three pools, every time it receives a cache request for a key with the prefix `cust`. In that case, a request to store data under `cust/12345-abcd` will be sent in parallel to all three pools that you named in the `route_allsync{}` call in the proxy configuration file, in the definition of the `cust` route.
 
 For more information about configuring proxy pools and routes, see [Configure the built-in proxy]({{<proxy_base_path>}}configure).
 
