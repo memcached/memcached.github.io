@@ -158,7 +158,7 @@ You can use a `cmdmap{}` call in your configuration file in any place where a ro
     map = {
         main = cmdmap{
             set = route_direct{
-                child = { "main_pool" },
+                child = "main_pool",
             },
         },
     },
