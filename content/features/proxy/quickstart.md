@@ -11,7 +11,7 @@ This page helps you get familiar with the Memcached built-in proxy by guiding yo
 * Set up a minimal proxy configuration file that lets the proxy use two Memcached servers as its backend.
 * Run this proxy-based Memcached architecture, and observe the proxy at work by connecting to it and querying it.
 
-For detailed documentation about the Memcached built-in proxy, see [Proxy](({{<legacy_proxy_base_path>}})).
+For a general overview of the Memcached built-in proxy, see [Built-in proxy]({{<proxy_base_path>}}).
 
 ## Before you begin
 

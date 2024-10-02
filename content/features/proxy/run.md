@@ -5,7 +5,7 @@ weight = 40
 
 This page is about running Memcached as a proxy for other Memcached servers.
 
-For a general overview of the proxy, see [Proxy]({{<legacy_proxy_base_path>}}). For a hands-on tutorial that guides you through compiling and running the proxy with a simple configuration, see [Built-in Proxy Quickstart]({{<proxy_base_path>}}quickstart).
+For a general overview of the proxy, see [Built-in proxy]({{<proxy_base_path>}}). For a hands-on tutorial that guides you through compiling and running the proxy with a simple configuration, see [Built-in Proxy Quickstart]({{<proxy_base_path>}}quickstart).
 
 ## Before you begin {#prereqs}
 

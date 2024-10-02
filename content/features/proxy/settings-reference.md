@@ -1,6 +1,6 @@
 +++
 title = 'Proxy settings reference'
-weight = 101
+weight = 110
 +++
 
 This page is a reference for the settings you can optionally define to fine-tune the behavior of the Memcached built-in proxy. For a guide to applying these settings, see [Adjust proxy settings]({{<proxy_base_path>}}configure#settings).

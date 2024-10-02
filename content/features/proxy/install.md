@@ -8,7 +8,7 @@ The Memcached built-in proxy is available only if you activate a specific config
 * Build and install Memcached with its proxy features enabled.
 * Download the Lua library that the proxy requires for common tasks.
 
-For a general overview of the proxy, see [Proxy]({{<legacy_proxy_base_path>}}). For a hands-on tutorial that guides you through compiling and running the proxy with a simple configuration, see [Built-in Proxy Quickstart]({{<proxy_base_path>}}quickstart).
+For a general overview of the proxy, see [Built-in proxy]({{<proxy_base_path>}}). For a hands-on tutorial that guides you through compiling and running the proxy with a simple configuration, see [Built-in Proxy Quickstart]({{<proxy_base_path>}}quickstart).
 
 ## Before you begin {#prereqs}
 
