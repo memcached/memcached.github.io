@@ -1,7 +1,12 @@
 +++
-title = 'Deployment Architectures'
+title = 'Deployment architectures'
 date = 2024-09-01T09:10:49-07:00
+weight = 60
 +++
+
+This page describes the workings of the Memcached built-in proxy in detail.
+
+For a general overview of the built-in proxy, see [Built-in proxy]({{<proxy_base_path>}}).
 
 ## Client connections and workers
 

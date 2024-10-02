@@ -1,7 +1,10 @@
 +++
-title = 'Usage Examples'
+title = 'Usage examples'
 date = 2024-09-01T09:08:32-07:00
+weight = 50
 +++
+
+This page provides illustraed examples of ways that you can create load-balanced, multiple-node cacheing systems using the Memcached built-in proxy. For a general overview of the built-in proxy, see [Built-in proxy]({{<proxy_base_path>}}).
 
 The memcached proxy is a flexible and lightweight system with few
 dependencies. Any memcached binary can be a proxy, a cache server, or both.
@@ -188,8 +191,6 @@ with a local sidecar (high bandwidth) and some might use a centralized pool
 Generally the overhead of local connections is low, but this must be verified
 because "container systems" can add significant overhead.
 
----
-
 ## Cache Layering Proxy
 
 ```mermaid
@@ -238,21 +239,3 @@ memcached pool.
 
 - Configuration of pools needs to be managed in two places (application
   clients, memcached proxies)
-
----
-
-# Use Case Examples
-
-## Simplifying and Unifying Cache Clients
-
-## Distributing data by usage
-
-## Best effort data redundancy
-
-## Transparent upgrades
-
-## Transparent pool resizing
-
-## Protocol translation
-
-
