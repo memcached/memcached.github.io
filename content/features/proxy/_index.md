@@ -1,5 +1,5 @@
 +++
-title = 'Builtin Proxy'
+title = 'Built-in proxy'
 date = 2024-09-01T09:31:55-07:00
 weight = 1
 next = '/features/proxy/quickstart/'
