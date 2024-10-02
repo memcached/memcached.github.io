@@ -1,64 +1,14 @@
 +++
-title = 'Proxy OldDocs'
+title = 'Proxy API reference'
 date = 2024-09-01T09:05:37-07:00
+weight = 200
 +++
 
-## What is it?
+This page provides a description of and reference to the Memcached built-in proxy API. These allow customization or replacement of the proxy's standard route library in advanced use cases.
 
-A proxy speaking the memcached text and meta protocols designed for managing
-clusters of memcached servers. It is fast, flexible, trivial to build and
-deploy. Since it is built into memcached and scriptable using Lua (5.4), many
-topologies, tricks, and deployment options are possible.
+For a general overview of the built-in proxy, see [Built-in proxy]({{<proxy_base_path>}}).
 
-Most existing memcached proxies reflect the architecture of the companies
-which originally made them. With the internal proxy, the "route handlers" are
-small Lua functions which pass requests into pools of servers. This allows it
-to not only emulate most existing proxies, but adapt more closely to your own
-architecture.
-
-## Quick Start
-
-Requires memcached version 1.6.23 or newer. If you run into trouble, you can
-try the [next branch](https://github.com/memcached/memcached/tree/next) in
-case a fix has already been found.
-
-You can use Docker to try the latest code.
-This image expects a "config.lua" to be in the directory
-You will need to start backend memcached's on your own!
-```sh
-docker run -v /path/to/config/directory:/config:ro --publish 11211:11211 \
-    dormando/memcached:next-proxy
-```
-
-A configuration flag is necessary to enable the feature:
-```sh
-./configure --enable-proxy
-make
-make test
-```
-
-If building from the `next` git branch, you will need to run a script to grab
-some vendored code:
-```sh
-cd vendor/
-./fetch.sh
-cd ..
-./configure --enable-proxy
-make
-make test
-```
-
-Unless you want to write your route handlers from scratch, you need a route
-library. We supply [a route library](https://github.com/memcached/memcached-proxylibs/tree/main/lib/routelib) for ease of use. Note that future releases should include this library directly, so you will not always need to download it separately.
-
-Please see the [routelib README](https://github.com/memcached/memcached-proxylibs/blob/main/lib/routelib/README.md) for a quick start guide.
-
-You can route commands to the specified pools by adding "foo/" or "bar/" to
-the key, ie:
-
-`get foo/a\r\n` or `get foo/someotherkey\r\n`
-
-## Status
+## Development status of the proxy API
 
 At this stage API functions are mostly stable, but are still subject to
 occasional change. Most changes in functionality will be either additions or
@@ -66,19 +16,6 @@ with a backwards-compatible deprecation cycle.
 
 After 1.6.23, we do not expect major core changes to the API. We will stick to
 incremental improvements.
-
-## Protocol Commands
-
-The following commands are relevant for controlling memcached proxy
-
-- `stats proxy`: prints proxy-specific stats counters. Includes dynamically
-  created counters from the lua configuration.
-
-- `watch proxyreqs|proxyevents|proxyuser`: watch commands for streaming logs
-specific to the proxy.
-
-- Sending a `SIGHUP` signal to memcached will cause the proxy to reload its
-  configuration. This does not interrupt active traffic.
 
 ## Features
 
@@ -99,21 +36,6 @@ Roadmapped features:
 * Expanded API for manipulating request data easily
 * TLS support for backend connections (frontend TLS is already supported)
 
----
-
-## Examples and use cases
-
-See [this document on example architectures](/ProxyExamples) for
-different methods of deploying and using the proxy.
-
----
-
-## Architecture and Workflows
-
-See [this document on architecture](/ProxyArch) for details on the proxy's
-thread components and how various subsystems work.
-
----
 
 ## Configuration API {#configuration_api}
 
@@ -632,16 +554,6 @@ mcp.pool({backend1, backend2, etc}, {
 })
 ```
 
----
-
-### Pluggable key hashing
-
----
-
-### Pluggable key distribution
-
----
-
 ## Programming caveats
 
 ### Global values and config reloads
@@ -862,67 +774,3 @@ response objects:
   - `mcp.MCMC_CODE_STORED`
   - `mcp.MCMC_CODE_EXISTS`
   - `mcp.MCMC_CODE_MISS`
-  -  TODO: document the rest.
-
----
-
-# FAQ
-
-## Why Lua?
-
-I thought ya'll could use a break from YAML :) We use Lua and its
-extensibility like glue: nearly everyone has different methods of managing
-their configuration, and in most cases a simple lua script would be able to
-parse output from such services or talk to them directly. A handful of for
-loops and object reuses can remove tens of thousands of lines of generated
-configuration.
-
-For route handling our usage of Lua is more bold, but again it's simply glue.
-Configurations for routes will tend to be wide but shallow: just a couple
-small function calls based on the contents of the request, and then the
-request is handed back off to the C side. Object methods written in C further
-avoid copying strings/data to/from Lua for common operations.
-
-Since the proxy integrates with memcached's existing systems, we can (over
-time) ensure all large memory allocations are handled outside of Lua. The rest
-of the tiny allocations, if any, are tied to a coroutine and released
-immediately after the (typically under a millisecond) request/response.
-
-## Why not LuaJIT?
-
-For half the answer to this, please see [Why lua?](#why-lua) - for loading
-configuration the performance difference isn't going to matter much. For route
-handling very little work is done from Lua, which will be reduced or removed
-as development continues.
-
-When development started LuaJIT had a much more rocky status. Also Lua 5.4 has
-a good number of language and performance improvements on its own.
-
-## Why not use a mesh router?
-
-Memcached's proxy is not intended to replace a mesh router; its scope is much
-smaller and more performance focused. A mesh router may be highly configurable,
-with broad support, but will be very slow. Caching services (and in this case
-a caching proxy) can be used to restore performance to a service migrated to a
-mesh router; for cost or practicality reasons.
-
-Many data queries don't or shouldn't go through a mesh router anyway. If you
-want to speed up access to data storage from an application implemented as an
-endpoint on a mesh router, a caching service is what sits behind that
-endpoint but before its actual data storage.
-
-## What happens to in-flight requests on config reload?
-
-When the configuration is reloaded, `mcp_config_routes` gets called again.
-During this process routes are assembled into functions and `mcp.attach()` is
-called with these top level hooks. Any time a request comes in these top level
-hooks are checked for their associated function.
-
-This means once a request fires off its hook, it is immune from configuration
-changes until it completes. Any new request coming in will see what's
-presently configured in a hook and get the new code even as older requests are
-being processed.
-
-This does mean you have to be careful with using global variables in Lua: we
-suggest the use of function closures for routes to avoid configurations
-clashing.
