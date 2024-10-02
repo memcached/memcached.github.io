@@ -33,6 +33,8 @@ Setting up a backend doesn't require any special Memcached configuration. A back
 The proxy configuration organizes backends into one or more named groups called <em>pools</em>. Each pool contains one or more backends.
 
 When the proxy receives a request to read or write cache data under a given key, the proxy uses various criteria to select one of its pools. It then forwards the cache request to a backend within that pool. For more information, see [Routing criteria](#routing).
+
+Once it has selected a pool to route a request to, the proxy chooses a single backend within the pool based on a consistent hash of the request key. In this way, a given key is always handled by the same backend within a given pool. You can fine-tune the specifics of this hashing behavior, as well as other pool-specific settings, when [configuring your pools]({{<proxy_base_path>}}configure#pools).
 </dd>
 
 <dt>Set</dt>
