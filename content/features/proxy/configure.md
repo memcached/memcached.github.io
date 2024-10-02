@@ -68,7 +68,7 @@ The `pools{}` block contains one or more pool definitions in the following forma
 
 ```lua
 {{<var>}}POOL_NAME{{</var>}} = {
-    options = { {{<var>}}OPTIONS{{</var>}} },
+    options = { {{<var>}}POOL_OPTIONS{{</var>}} },
     backend_options = { {{<var>}}BACKEND_OPTIONS{{</var>}} },
     backends = {
         "{{<var>}}HOST{{</var>}}:{{<var>}}PORT{{</var>}}",
@@ -80,12 +80,11 @@ The `pools{}` block contains one or more pool definitions in the following forma
 Replace the following:
 
 * <var>POOL_NAME</var>: a name for this pool—for example, `northeast_1`.
+    {{< callout type="warning" >}}Don't start any pool name with `set_`. That name style is reserved for sets of pools. For more information, see [Define sets of pools](#sets).{{</callout>}}
 * <var>POOL_OPTIONS</var>: (optional) a comma-separated list, in `key=value` format, of settings for the proxy to apply to this pool. For a list of settings, see [Pool API]({{<legacy_proxy_base_path>}}#pool-api).
 * <var>BACKEND_OPTIONS</var>: (optional) a comma-separated list, in `key=value` format, of settings for the proxy to apply to all of the backends in the pool. For a list of settings, see [Backend API]({{<legacy_proxy_base_path>}}#backend-api).
 * <var>HOST</var>: the IP address or hostname of the Memcached server you are defining as a backend.
 * <var>PORT</var>: (optional) the TCP port of the Memcached server you are defining as a backend. The default value is `11211`.
-
-{{< callout type="warning" >}}Don't start any pool name with `set_`. That name style is reserved for sets of pools. For more information, see [Define sets of pools](#sets).{{</callout>}}
 
 To fine-tune the proxy settings for an individual backend, replace its entry in the `backends` list with a curly-braced list of back-end options. The list must include `host`.
 
