@@ -39,6 +39,7 @@ Once it has selected a pool to route a request to, the proxy chooses a single ba
 
 <dt>Set</dt>
 <dd>
+
 More complex routing topologies might require another layer of grouping. You can further group pools into <em>sets</em>. For more information, see [Gather related pools into sets]({{<proxy_base_path>}}configure#sets).
 
 Sets can be useful for gathering pools into named <em>zones</em>, in order to set up failover priorities. For more information, see [Prioritize a route using local zones]({{<proxy_base_path>}}configure#zones).
