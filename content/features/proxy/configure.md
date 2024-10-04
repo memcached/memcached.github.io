@@ -60,7 +60,7 @@ settings {
 
 ### Define backend pools {#pools}
 
-Use the required `pools{}` block to define the locations and other attributes of the back-end Memcached servers that the router directs queries to.
+Use the required `pools{}` block to define the locations and other attributes of the backend Memcached servers that the router directs queries to.
 
 You can optionally define more than one `pools{}` block. Doing so is functionally equivalent to combining all of their contents into a single `pools{}` block. For the sake of simplicity, this documentation uses example configuration files with only one `pools{}` block.
 
@@ -86,7 +86,7 @@ Replace the following:
 * <var>HOST</var>: the IP address or hostname of the Memcached server you are defining as a backend.
 * <var>PORT</var>: (optional) the TCP port of the Memcached server you are defining as a backend. The default value is `11211`.
 
-To fine-tune the proxy settings for an individual backend, replace its entry in the `backends` list with a curly-braced list of back-end options. The list must include `host`.
+To fine-tune the proxy settings for an individual backend, replace its entry in the `backends` list with a curly-braced list of backend options. The list must include `host`.
 
 The following example defines two backends, including one that runs on port 11212 and has a ten-second connection timeout:
 

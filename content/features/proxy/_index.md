@@ -9,16 +9,16 @@ This page provides a conceptual overview of the Memcached built-in proxy. For a 
 
 ## Overview {#overview}
 
-Starting with version 1.6.23, Memcached includes a built-in proxy. You can run a Memcached server that acts as a front-end proxy to any number of back-end Memcached servers. These backends can run anywhere that the proxy can connect to using TCP/IP.
+Starting with version 1.6.23, Memcached includes a built-in proxy. You can run a Memcached server that acts as a frontend proxy to any number of backend Memcached servers. These backends can run anywhere that the proxy can connect to using TCP/IP.
 
-With a proxied Memcached setup, clients always connect to the Memcached proxy, instead of connecting directly to the back-end Memcached servers. The proxy forwards cache requests to pools of backends that you define. This setup can provide improved load balancing and fault tolerance to applications with high-demand caching needs.
+With a proxied Memcached setup, clients always connect to the Memcached proxy, instead of connecting directly to the backend Memcached servers. The proxy forwards cache requests to pools of backends that you define. This setup can provide improved load balancing and fault tolerance to applications with high-demand caching needs.
 
 ## Key concepts {#concepts}
 
 <dl>
 <dt>Proxy</dt>
 <dd>
-The Memcached <em>built-in proxy</em> runs as a front-end interface between client applications that need to read or write cached data, and the underlying back-end Memcached servers. The proxy supports <a href="/protocols/basic">the Memcached basic command protocol</a>. This lets clients connect to a Memcached proxy and interact with it using the same techniques that they use with an ordinary Memcached server.
+The Memcached <em>built-in proxy</em> runs as a frontend interface between client applications that need to read or write cached data, and the underlying backend Memcached servers. The proxy supports <a href="/protocols/basic">the Memcached basic command protocol</a>. This lets clients connect to a Memcached proxy and interact with it using the same techniques that they use with an ordinary Memcached server.
 </dd>
 
 <dt>Backend</dt>
@@ -68,7 +68,7 @@ In typical proxy use, you let the proxy load the route library file as-is, with 
 
 The Memcached proxy uses various criteria to decide which of its known backends that it should forward data storage or retrieval requests to. These criteria can include the following:
 
-* **Key prefix.** For example, you can configure the router to send requests for the key `data/12345` to one pool of back-end servers, and requests for the key `cust/12345` to a different pool. Requests with no prefix or an unrecognized prefix can be handled by a designated default pool.
+* **Key prefix.** For example, you can configure the router to send requests for the key `data/12345` to one pool of backend servers, and requests for the key `cust/12345` to a different pool. Requests with no prefix or an unrecognized prefix can be handled by a designated default pool.
 
     You can configure the proxy to recognize various shapes of prefixes, with different lead-in or separator characters between the prefix and the main key name. For example, if your application's cache keys look more like `--cust//12345` than `cust/12345`, you can still configure the proxy to recognize the former case as having the prefix `cust`.
 
