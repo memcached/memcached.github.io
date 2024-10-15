@@ -42,11 +42,11 @@ The servers understand how to store and fetch items. They also manage when to ev
 
 ### Servers are Disconnected From Each Other
 
-Memcached servers are unaware of each other. There is no crosstalk, no syncronization, no broadcasting, no replication. Adding servers increases the available memory. Cache invalidation is simplified, as clients delete or overwrite data on the server which owns it directly.
+Memcached servers are unaware of each other. There is no crosstalk, no synchronization, no broadcasting, no replication. Adding servers increases the available memory. Cache invalidation is simplified, as clients delete or overwrite data on the server which owns it directly.
 
 ### O(1)
 
-All commands are implemented to be as fast and lock-friendly as possible. This gives allows near-deterministic query speeds for all use cases.
+All commands are implemented to be as fast and lock-friendly as possible. This allows near-deterministic query speeds for all use cases.
 
 Queries on slow machines should run in well under 1ms. High end servers can serve millions of keys per second in throughput.
 
