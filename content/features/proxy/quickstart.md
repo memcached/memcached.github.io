@@ -95,7 +95,7 @@ echo 'pools{
 
 routes{
     map = {
-        quickstart_route = route_direct{
+        quickstart = route_direct{
             child = "quickstart_pool",
         },
     },
@@ -125,7 +125,7 @@ routes{
 
     ```
     telnet localhost 11211
-    set quickstart-data 0 0 6
+    set quickstart/data 0 0 6
     Hello!
     ```
     
@@ -134,7 +134,7 @@ routes{
 1. Fetch the data again:
 
     ```
-    get quickstart-data
+    get quickstart/data
     ```
     
     The Memcached proxy responds with the following:
@@ -150,11 +150,11 @@ routes{
     
     1. At the `telnet>` prompt, enter `quit`.
 
-At this point, you can optionally connect to the two Memcached backend servers by connecting to ports `11212` and `11213` and running the command `get quickstart-data` on both. One of the two servers returns the value `Hello!`. That server is the one that the proxy chose as the backend to store the data under the `quickstart-data` key.
+At this point, you can optionally connect to the two Memcached backend servers by connecting to ports `11212` and `11213` and running the command `get quickstart/data` on both. One of the two servers returns the value `Hello!`. That server is the one that the proxy chose as the backend to store the data under the `quickstart/data` key.
 
 ## Clean up
 
-When you are finished with this tutorial, you can stop the three Memcached processes that you launched in the previous steps.
+When you are finished with this tutorial, you can stop the three Memcached processes that you launched in the previous steps. You can do this by repeatedly running `fg` then pressing ctrl-c until all instances are stopped.
 
 Because this quickstart didn't have you install the Memcached software that you built, you can clean up by deleting the source directory that you downloaded.
 
