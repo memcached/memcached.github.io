@@ -81,8 +81,8 @@ Replace the following:
 
 * <var>POOL_NAME</var>: a name for this pool—for example, `northeast_1`.
     {{< callout type="warning" >}}Don't start any pool name with `set_`. That name style is reserved for sets of pools. For more information, see [Define sets of pools](#sets).{{</callout>}}
-* <var>POOL_OPTIONS</var>: (optional) a comma-separated list, in `key=value` format, of settings for the proxy to apply to this pool. For a list of settings, see [Pool API]({{<legacy_proxy_base_path>}}#pool-api).
-* <var>BACKEND_OPTIONS</var>: (optional) a comma-separated list, in `key=value` format, of settings for the proxy to apply to all of the backends in the pool. For a list of settings, see [Backend API]({{<legacy_proxy_base_path>}}#backend-api).
+* <var>POOL_OPTIONS</var>: (optional) a comma-separated list, in `key=value` format, of settings for the proxy to apply to this pool. For a list of settings, see [Pool API]({{<proxy_base_path>}}/api-reference#pool-api).
+* <var>BACKEND_OPTIONS</var>: (optional) a comma-separated list, in `key=value` format, of settings for the proxy to apply to all of the backends in the pool. For a list of settings, see [Backend API]({{<proxy_base_path>}}/api-reference#backend-api).
 * <var>HOST</var>: the IP address or hostname of the Memcached server you are defining as a backend.
 * <var>PORT</var>: (optional) the TCP port of the Memcached server you are defining as a backend. The default value is `11211`.
 
@@ -203,7 +203,7 @@ Replace the following:
 
 #### The `cmap` section {#cmap}
 
-To have the proxy handle requests differently depending upon the Memcached command that it receives, include a `cmap` section in your `routes{}` block. For example, you can configure the proxy to direct all `get` requests to one pool, regardless of prefix, and all `set` requests to a different pool.
+To have the proxy handle requests differently depending upon the Memcached command that it receives, include a `cmap` section in your `routes{}` block. For example, you can configure the proxy to direct all `get` requests to a direct handler, regardless of prefix, and all `set` requests to a ttl-modifier handler.
 
 ```lua
 cmap = {
@@ -243,7 +243,7 @@ default = {{<var>}}HANDLER_TYPE{{</var>}}{ {{<var>}}HANDLER_ARGS{{</var>}} },
 The following example file demonstrates all four of the configuration file sections described earlier on this page:
 
 ```lua
--- Turn on the proxy's verbose mode.
+-- Turn on the route library's verbose mode.
 verbose(true)
 
 -- Override a handful of default settings for proxy behavior.
@@ -408,7 +408,7 @@ Doing this involves the following steps:
 
 1. Declare a _local zone_ in your proxy configuration file.
 1. Attach zone labels to the pools within your set definitions.
-1. In your route definitions, invoke a route handler that makes use of zone information. The only such handler defined by the standard route library is `route_zfailover`.
+1. In your route definitions, invoke a route handler that makes use of zone information. Handlers supporting this typically start with a 'z', like `route_zfailover`
 
 To declare the local zone and attach zone labels to your defined pools, modify your configuration file's `pools{}` block like this:
 
@@ -474,7 +474,7 @@ pools {
 }
 ```
 
-The only route handler that makes use of zone information is [`route_zfailover`]({{<proxy_base_path>}}reference#route_zfailover). The following proxy configuration excerpt extends the previous example with a `routes{}` block that uses `route_zfailover`.
+The following proxy configuration excerpt extends the previous example with a `routes{}` block that uses [`route_zfailover`]({{<proxy_base_path>}}reference#route_zfailover).
 
 ```lua
 routes {
@@ -490,7 +490,7 @@ routes {
     },
 
     default = route_allfastest {
-        children = { "set_main_pools" }
+        children = "set_main_pools"
     },
 }
 ```
@@ -537,4 +537,4 @@ You can update your proxy configuration file without interrupting the proxy serv
 
     Replace <var>PROXY_PROCESS</var> with the process ID of the proxy.
     
-If the updated configuration file is valid, then Memcached reloads its configuration and continues running. Otherwise, Memcached exits with an error.
+If the updated configuration file is valid, then Memcached reloads its configuration and continues running. Otherwise, the configuration is _not reloaded_ and the previous configuration is still used. Errors are sent to an event log viewable by running `watch proxyevents` against the proxy.
