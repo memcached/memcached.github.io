@@ -1,5 +1,5 @@
 +++
-title = 'Deployment architectures'
+title = 'Internal Architecture'
 date = 2024-09-01T09:10:49-07:00
 weight = 60
 +++

@@ -113,7 +113,7 @@ Replace the following:
 * <var>POOL_LIST_OR_SET_NAME</var>: either one of the following:
     * A bracketed, comma-separated list of of pool names defined in the `pools{}` block of your configuration file—for example, `{ "cust_pool_1", "cust_pool_2" }`.
     * The name of a set defined in the `pools{}` block of your configuration file—for example, `"set_cust_pools"`.
-* <var>FAILOVER_COUNT</var>: the number of failures that the proxy receives from a pool before fails over to the next pool in the list.
+* <var>FAILOVER_COUNT</var>: the number of times we will try another pool in the list before returning an error.
 * <var>SHUFFLE_BOOLEAN</var>: if true, then the proxy randomizes the list of pools before routing the request. Otherwise, uses the list of pools in the given order.
 * <var>MISS_BOOLEAN</var>: if true, then the proxy treats both misses and errors as failures. Otherwise, the proxy counts only errors as failures.
 
