@@ -18,7 +18,8 @@ With a proxied Memcached setup, clients always connect to the Memcached proxy, i
 <dl>
 <dt>Proxy</dt>
 <dd>
-The Memcached <em>built-in proxy</em> runs as a frontend interface between client applications that need to read or write cached data, and the underlying backend Memcached servers. The proxy supports <a href="/protocols/basic">the Memcached basic command protocol</a>. This lets clients connect to a Memcached proxy and interact with it using the same techniques that they use with an ordinary Memcached server.
+
+The Memcached <em>built-in proxy</em> runs as a frontend interface between client applications that need to read or write cached data, and the underlying backend Memcached servers. The proxy supports the Memcached [basic](/protocols/basic) and [meta](/protocols/meta) command protocols. This lets clients connect to a Memcached proxy and interact with it using the same techniques that they use with an ordinary Memcached server.
 </dd>
 
 <dt>Backend</dt>
@@ -88,7 +89,7 @@ For more information, see [Install the built-in proxy]({{<proxy_base_path>}}inst
 
 If you use the standard route library with the Memcached built-in proxy, then you need to create an additional configuration file that defines the pools available to your proxy, and how it should map requests to pools depending upon various criteria. This configuration file also uses Lua syntax, but in most cases you can treat it as a limited vocabulary specific to Memcached proxy configuration. For more information, see [Configure the built-in proxy]({{<proxy_base_path>}}configure).
 
-In advanced use cases, you can modify the route library file, or even replace it entirely using your own Lua code. This requires a deeper knowledge of the proxy configuration API. For more information, [Configuration API]({{<legacy_proxy_base_path>}}#configuration_api).
+In advanced use cases, you can modify the route library file, or even replace it entirely using your own Lua code. This requires a deeper knowledge of the proxy configuration API. For more information, [Configuration API]({{<proxy_base_path>}}api-reference).
 
 ## Proxy deployment examples
 
