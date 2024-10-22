@@ -16,6 +16,16 @@ The proxy returns a fast fail on any request if it it already actively processin
 
 If set to `0`, then the proxy does not impose this limit.
 
+## <code>backend_use_tls</code>
+
+<table>
+<tr><th>Type</th><td><code>boolean</code></td></tr>
+<tr><th>Default</th><td><code>false</code></td></tr>
+</table>
+
+Enable TLS by default when connecting to backend servers. Proxy must be
+compiled with `--enable-proxy-tls` option.
+
 ## <code>backend_connect_timeout</code>
 
 <table>
