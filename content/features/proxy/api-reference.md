@@ -14,34 +14,26 @@ At this stage API functions are mostly stable, but are still subject to
 occasional change. Most changes in functionality will be either additions or
 with a backwards-compatible deprecation cycle.
 
-After 1.6.23, we do not expect major core changes to the API. We will stick to
-incremental improvements.
-
 ## Features
 
 * Supports most of the text and meta protocols
 * Dynamically configured backend pools and route handling
 * Pluggable key distribution hashing algorithms
 * Reduces connections to backend servers
-* Use of Lua coroutines allows procedural programming style
-* Able to selectively override commands, or serve from memcached embedded in
+* Able to selectively override commands, or serve data from memcached embedded in
   the proxy
 * Design routes to precisely fit your needs via simple Lua
+* Use TLS to connect to memcached backends
 * Flexible topologies: Run as a sidecar client, a large border proxy, or
   directly on an existing pool of servers
-* Fast: all performance critical code is still C. Minimal Lua is executed for
-  routing requests to backends.
-
-Roadmapped features:
-* Expanded API for manipulating request data easily
-* TLS support for backend connections (frontend TLS is already supported)
-
+* Fast: performance critical code is still C. Minimal Lua is executed for
+  manipulating and deciding how to route requests.
 
 ## Configuration API {#configuration_api}
 
-To load the configuration, a dedicated thread first compiles the Lua code. It then calls the function `mcp_config_pools`, which loads all backends, collects them into pools, and returns a Lua table holding all of the final pool objects. Next, for each worker thread, they each execute `mcp_config_routes`. This function is expected to set up route handling (code that matches requests to a pool), and sets the command hooks that memcached will call (ie; hooks on get, set, and so on).
+To load the configuration, a dedicated thread first compiles the Lua code. It then calls the function `mcp_config_pools`, which loads all backends, collects them into pools, and returns a Lua table holding all of the final pool objects. Next, each worker thread calls `mcp_config_routes`. This function is expected to set up route handers and sets the command hooks that memcached will call (ie; hooks on get, set, and so on).
 
-<pre class="mermaid">
+```mermaid
 ---
 title: Loading Configuration
 ---
@@ -57,7 +49,7 @@ flowchart TD
     C2["Run mcp.attach(CMD, handler)"]
     end
     configure --> |for each worker: copy lua code and config table|worker
-</pre>
+```
 
 The proxy flow starts by parsing a request (ie: `get foo`) and looking for a function hook for this command. If a hook exists, it will call the supplied function. If no hook exists, it will handle the request as though it were a normal memcached.
 
@@ -262,7 +254,7 @@ _all_ enqueued requests are immediately executed.
 This means if you enqueue two requests, then queue and wait on a third, all
 three requests are batched and executed simultaneously.
 
-<pre class="mermaid">
+```mermaid
 ---
 title: enqueue all at once
 ---
@@ -272,9 +264,9 @@ flowchart TD
     C -->|request| D[backend]
     C -->|request| E[backend]
     C -->|request| F[backend]
-</pre>
+```
 
-<pre class="mermaid">
+```mermaid
 ---
 title: enqueue in stages
 ---
@@ -284,7 +276,7 @@ flowchart TD
     C -->|request| D[backend]
     C -->|request| E[backend]
 ```
-</pre>
+```
 
 ### Where is the results table?
 
