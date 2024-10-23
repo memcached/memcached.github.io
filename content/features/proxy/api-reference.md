@@ -652,6 +652,10 @@ mcp.backend({
     -- failure (`SERVER_ERROR backend failure`)
     down = true|false,
 
+    -- If true, and backend TLS support has been compiled in with
+    -- `--enable-proxy-tls`, we will connect to this backend with TLS.
+    tls = true|false,
+
     -- These next options override global settings, see below for detail.
     -- seconds may be fractional, ie: 0.5 for 500ms or 2.75 for 2750ms
     -- mcp.tcp_keepalive
