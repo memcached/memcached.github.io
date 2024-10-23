@@ -12,6 +12,9 @@ library from scratch.
 
 For a general overview of the built-in proxy, see [Built-in proxy]({{<proxy_base_path>}}).
 
+We are catching up on a backlog of documentation. If you think something is
+missing or find an error [please report it](https://github.com/memcached/memcached.github.io)
+
 ## Development status of the proxy API
 
 API functions are mostly stable, but are still subject to
