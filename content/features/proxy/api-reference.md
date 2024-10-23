@@ -6,11 +6,15 @@ weight = 200
 
 This page provides a description of and reference to the Memcached built-in proxy API. These allow customization or replacement of the proxy's standard route library in advanced use cases.
 
+Use this reference if you wish to make changes to the standard route library,
+extend it with your own custom route handlers, or write your own fully custom
+library from scratch.
+
 For a general overview of the built-in proxy, see [Built-in proxy]({{<proxy_base_path>}}).
 
 ## Development status of the proxy API
 
-At this stage API functions are mostly stable, but are still subject to
+API functions are mostly stable, but are still subject to
 occasional change. Most changes in functionality will be either additions or
 with a backwards-compatible deprecation cycle.
 
@@ -51,102 +55,289 @@ flowchart TD
     configure --> |for each worker: copy lua code and config table|worker
 ```
 
-The proxy flow starts by parsing a request (ie: `get foo`) and looking for a function hook for this command. If a hook exists, it will call the supplied function. If no hook exists, it will handle the request as though it were a normal memcached.
+## Configuration stages
 
-In Lua, this looks like: `mcp.attach(mcp.CMD_GET, function)` - Functions are objects and can be passed as arguments. The function is called within a coroutine, which allows us to designs routes procedurally even if they have to make a network call in the middle of executing.
+As noted above, configuring the proxy happens in
+two distinct stages. These stages use fully independent Lua VM instances: a
+configuration instance, and one for each worker thread. This separation is
+designed to improve the safety of reloading the config and for performance as
+a separate "configuration thread" is used for more intense work.
 
-The function is called with a prototype of:
+If a configuration fails to execute on reload, in most cases, the proxy will
+continue to run the old configuration.
+
+The same Lua code file is used for all threads: it is loaded and compiled
+once.
+
+The first stage is to call `mcp_config_pools` from the "configuration thread".
+This stage defines backends and organizes them into pools. It is also a good
+place to decide on how keys and commands should be routed. A table tree of
+information is then returned from this function. The proxy is not blocked or
+otherise impacted while this function runs.
+
+The second stage is to call `mcp_config_routes` from each "worker thread".
+These VM's run independently for performance reasons: there is no locking
+involved and any garbage collection happens per-thread instead of for the
+whole process.
+
+In this second stage we take information generated in the first stage to
+create function generator objects, which produce coroutines that actually
+process user requests. We also generate router objects that decide which
+functions should handle a particular command or key prefix. Finally, we attach
+either a function generator or a router object to the proxy's command hooks.
+
+Since this second stage is executed in the same worker threads that handle
+requests, it is a good idea to keep the code simple. Errors here can also
+stop the process and are not easily recoverable.
+
 ```lua
-function(request)
+function mcp_config_pools()
+    -- create a table of pools, and route information
+    local t = {}
+    -- fill t with pools/information
+    return t
+end
 
+function mcp_config_routes(t)
+    -- Create function generators and routers.
+    local router = -- see below
+    -- Here we override any command. It is also possible to override only
+    -- specific commands: ie: just override 'set', but handle 'get' as though
+    -- we are not a proxy but a normal storage server.
+    mcp.attach(mcp.CMD_ANY_STORAGE, router)
 end
 ```
 
-The most basic example of a valid route would be:
-`mcp.attach(mcp.CMD_GET, function(r) return "SERVER_ERROR no route\r\n" end)`
+Our [Route
+library](https://github.com/memcached/memcached-proxylibs/tree/main/lib/routelib)
+can handle this for you and is a good abstraction to start from. For most
+people the rest of this API reference can be used to create your own route
+handlers. Since routelib handles the stages of execution, you can focus on
+processing requests and nothing else about how the configuration is built.
 
-For any get command, we will return the above string to the client. This isn't very useful as-is. We want to test the key and send the command to a specific backend pool; but the function only takes a request object. How are routes actually built?
+---
 
-The way we recommend configuring routes are with _function closures_. In lua functions can be created capturing the environment they were created in. For example:
+## Extending routelib with new handlers
 
-```lua
-function new_route()
-  local res = "SERVER_ERROR no route\r\n"
-  return function(r)
-    return res
-  end
-end
+Examples for extending routelib can be found
+[here](https://github.com/memcached/memcached-proxylibs/blob/main/lib/routelib/examples/)
+- look for files that start with `custom`. The files are commented. More
+  detailed information is repeated here.
 
-mcp.attach(mcp.CMD_GET, new_route())
+### Loading custom handlers
+
+You must instruct memcached to load your custom route handler files. If you
+are already using routelib your start line may look like:
+
+```
+-o proxy_config=routelib.lua,proxy_arg=config.lua
 ```
 
-In this example, `new_route()` _returns a function_. This function has access to the environment (`local res = `) of its parent. When proxy calls the `CMD_GET` hook, it's calling the function that was returned by `new_route()`, not `new_route()` itself. This function uselessly returns a string.
+If your custom route handler is defined in `customhandler.lua`, you need to
+add it as an argument to `proxy_config`:
 
-This should give you enough context to understand how the libraries in [the proxylibs repository](https://github.com/memcached/memcached-proxylibs) are implemented.
+```
+-o proxy_config=routelib.lua:customhandler.lua,proxy_arg=config.lua
+```
 
-Since we have a real programming language for both configuration and the routes themselves, we can write loops around patterns and keep the configuration short.
+This lets the proxy manage loading and reloading the configuration for you,
+without having to focus too much on Lua.
 
-## Function generators and request contexts
+### Custom handler configuration stages
 
-NOTE: This information is only useful for people intending to develop a route
-library or extend `routelib`. End users should read the
-[routelib](https://github.com/memcached/memcached-proxylibs/blob/main/lib/routelib/README.md) README.
+As described above in [configuration stages](#configuration-stages) there is a
+two-stage process to configuration loading. This needs to be taken into
+account when writing custom handlers for routelib as well.
 
-To achieve high performance while still allowing dynamically scriptable route
-handling, we must A) pre-create data, strings, etc and B) avoid allocations,
-which avoids Lua garbage collection. We also need to carefully manage the
-lifecycle of pools and backends used by the proxy, and maintain access to
-useful context for the duration of a request.
+For routelib we call a `_conf` function during the first stage, and `_start`
+during the second per-worker stage.
 
-This requires wrapping request handling functions _with context_
+Also, we must register our handler with routelib via a call to `register_route_handlers` when the code is loading.
+
+For example:
+```lua
+-- This function is executed during the first stage, in the configuration VM.
+-- This is where we can check and transform arguments passed in from the
+-- routelib config
+function route_myhello_conf(t, ctx)
+    -- User supplied arguments are in the `t` table.
+    -- A `ctx` context object is also supplied, which can be queried for
+    -- information about the handler, help with statistical counters, etc.
+    t.msg = string.format("%s: %s", t.msg, ctx:label())
+    -- Get an internal ID to later use as a global counter for how many times
+    -- our hello function is called.
+    if t.stats then
+        ctx:stats_get_id("myhello")
+    end
+
+    -- This return table must be a pure lua object. It is copied _between_
+    -- the configuration VM and each worker VM's, so special objects,
+    -- metatables, and so on cannot be transferred.
+    return t
+end
+```
+
+Next, we define the `_start` routine, which creates a function generator. This
+generator function is used to create coroutines used to process requests.
 
 When a request is processed by the proxy, it needs to first acquire a _request
-context slot_. This provides a function that will execute a request. After a
-request is complete the slot may be _reused_ for the next request. This also
+context slot_. This provides a lua function that will process a request. After a
+request is complete the slot may be _reused_ for another request. This
 means we need _as many slots as there are parallel requests_. If a worker is
 processing three `get` requests _in parallel_, it will need to create three
 contexts in which to execute them.
 
-We use a function generator to create this data. This also allows us to
-pre-create strings, validate arguments, and so on in order to speed up
-requests.
-
-A minimal example:
+Pre-creating and caching request slots gives us good performance while still
+using a scripting language to process requests.
 
 ```lua
-function mcp_config_routes(pool)
-    -- get a new bare object.
+-- Here we prepare the generator that will later generate each request slot,
+-- and slots will ultimately process requests.
+-- This indirection allows us to share pre-processed information with every
+-- slot, further improving performance. It also lets all slots share internal
+-- references to pools and backends.
+
+-- This function is excuted during the second stage, on every worker thread.
+-- The `t` argument is the table that was returned by the _conf function.
+-- All information needed to generate this handler _must_ be contained in this
+-- table. It is bad form to reach for global variables at this stage.
+function route_myhello_start(t, ctx)
     local fgen = mcp.funcgen_new()
-    -- reference this pool object so it cannot deallocate and be lost.
-    -- note that we can also reference _other function generators_,
-    -- providing us with a graph/tree/recursive style configuration.
-    local handle = fgen:new_handle(pool)
+    -- not adding any children for this function.
 
-    -- finalize the function generator object. When we need to create a new
-    -- slot, we will call `route_handler`, which will return a function
-    fgen:ready({ f = route_handler, a = handle })
+    -- We pass in the argument table to the function generator directly here,
+    -- the table will then be passed along again when create a slot.
+    -- The `n` argument creates a name for this function, visible by running
+    -- `stats proxyfuncs`
+    -- `f` is the function to call when we need a new slot made.
+    fgen:ready({ a = t, n = ctx:label(), f = route_myhello_f })
 
-    -- attach this function generator to `get` commands
-    mcp.attach(mcp.CMD_GET, fgen)
+    -- make sure to return the generator we just made
+    return fgen
 end
 
--- our job is to pre-configure a reusable function that will process requests
-function route_handler(rctx, a)
-    -- anything created here is available in the function below as part of its
-    -- local environment
-    local handle = a
+-- This is now the function that will be called every time we need a new slot.
+function route_myhello_f(rctx, a)
+    -- Do some final formatting of the message string.
+    -- Note there is no reason we can't do this in the `_start` function,
+    -- but we are doing this here to make a simple example.
+    local msg = string.format("SERVER_ERROR %s\r\n", a.msg)
+
+    local stats_id = a.stats_id
+    local s = mcp.stat -- small lua optimization, cache the stat func
+
+    -- This is the function called to process an actual request.
+    -- It will be cached and called again later on the next request.
+    -- Thus the above code in this func is not repeatedly executed.
     return function(r)
-        -- the rctx object is unique to _each slot generated_
-        -- it gives us access to backend API calls, info about the client
-        -- connection, and so on.
-        return rctx:enqueue_and_wait(r, handle)
+        if stats_id then
+            s(stats_id, 1)
+        end
+        return msg
     end
+end
+
+-- finally, we register this handler so routelib will allow us to use it in a
+-- config file.
+register_route_handlers({
+    "myhello",
+})
+```
+
+Another example for formatting the `_start` function, using more advanced
+lua syntax:
+```lua
+function route_myhello_start(t, ctx)
+    local fgen = mcp.funcgen_new()
+    local msg = string.format("SERVER_ERROR %s\r\n", a.msg)
+
+    fgen:ready({ n = ctx:label(), f = function(rctx, a)
+        -- Previously this would be `route_myhello_f`
+        -- The difference is we've generated msg just once for every slot that
+        -- will later be made, and aren't using the passed along arguments
+        -- table
+        local stats_id = a.stats_id
+        local s = mcp.stat
+
+        return function(r)
+            if stats_id then
+                s(stats_id, 1)
+            end
+            return msg
+        end
+    end})
+
+    return fgen
 end
 ```
 
+### Custom handlers with children
+
+Handlers that route to pools (or other handlers) must define `children`.
+Routelib will magically translate the _name_ of a child into a _pool object_
+inbetween the two configuration stages. This simplifies a lot of object
+management we would have to do otherwise.
+
+The simplest example is the `route_direct` handler. Given a routelib
+configuration that looks like:
+```lua
+pools{
+    main = { backends = { "127.0.0.1:11211" } }
+}
+
+routes{
+    map = {
+        main = route_direct{
+            child = "main"
+        }
+    },
+}
+```
+
+Above you can see the `route_direct` handler is given a singular `child`
+argument.
+
+```lua
+function route_direct_conf(t)
+    -- This table contains: t.child = "main", but we don't need to do any
+    -- processing and can simply pass this along.
+    -- Routelib looks for any keys that being with `child` and attempts to
+    -- translate them from words to internal pool objects for us.
+    return t
+end
+
+local function route_direct_f(rctx, handle)
+    -- Nothing else to do when generating this slot.
+    return function(r)
+        -- All we do when processing the actual request is send it down to the
+        -- handle we made earlier.
+        return rctx:enqueue_and_wait(r, handle)
+    end
+end
+
+function route_direct_start(t, ctx)
+    local fgen = mcp.funcgen_new()
+    -- t.child has been translated into something we can use here.
+    -- At this point we reference it into a handle we can later route to.
+    -- Handles must be generated once and are reused for every slot generated.
+    local handle = fgen:new_handle(t.child)
+    fgen:ready({ a = handle, n = ctx:label(), f = route_direct_f })
+    return fgen
+end
+```
+
+Aside from `child`, the most common argument is `children`, which will be a
+table. This table will contain an array of pools or a table of `name = pool`,
+commonly used for zoned route handlers (see `route_zfailover` for an example).
+
+All of this indirection (child -> pool object -> handle) is how the proxy
+manages the lifecycle of backend connections, which is important when
+live-reloading the configuration. Existing in-flight requests are not affected
+by the changing configuration and we free up resources as soon as possible.
+
 ---
 
-## Request context API and backend requests
+## Request context API and executing requests
 
 Function generator API
 ```lua
@@ -191,7 +382,7 @@ generating the function to ultimately serve requests.
 -- execute this function callback when this handle has been executed.
 -- this allows adding extra handling (stats counters, logging) or overriding
 -- wait conditions
-rctx:handle_set_cb(handle, function)
+rctx:handle_set_cb(handle, func)
 
 -- callbacks look like:
 local cb = function(res, req)
@@ -276,7 +467,6 @@ flowchart TD
     C -->|request| D[backend]
     C -->|request| E[backend]
 ```
-```
 
 ### Where is the results table?
 
@@ -314,9 +504,8 @@ end
 Lets say we want to route requests to different pools of memcached instances
 based on part of the key in the request: for this we use router objects.
 
-Routers can achieve this matching efficiently without having to examine the
-key inside Lua, which would result in many copies and regular
-expressions.
+If you are using routelib, you do not ever need to create routers directly.
+Routelib exposes most of this functionality under its `routes{}` section.
 
 ```lua
 -- Minimal example of a router. Here:
