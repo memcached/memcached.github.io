@@ -204,8 +204,7 @@ using a scripting language to process requests.
 -- The `t` argument is the table that was returned by the _conf function.
 -- All information needed to generate this handler _must_ be contained in this
 -- table. It is bad form to reach for global variables at this stage.
-function route_myhello_start(t, ctx)
-    local fgen = mcp.funcgen_new()
+function route_myhello_start(t, ctx, fgen)
     -- not adding any children for this function.
 
     -- We pass in the argument table to the function generator directly here,
@@ -214,9 +213,6 @@ function route_myhello_start(t, ctx)
     -- `stats proxyfuncs`
     -- `f` is the function to call when we need a new slot made.
     fgen:ready({ a = t, n = ctx:label(), f = route_myhello_f })
-
-    -- make sure to return the generator we just made
-    return fgen
 end
 
 -- This is now the function that will be called every time we need a new slot.
@@ -250,8 +246,7 @@ register_route_handlers({
 Another example for formatting the `_start` function, using more advanced
 lua syntax:
 ```lua
-function route_myhello_start(t, ctx)
-    local fgen = mcp.funcgen_new()
+function route_myhello_start(t, ctx, fgen)
     local msg = string.format("SERVER_ERROR %s\r\n", a.msg)
 
     fgen:ready({ n = ctx:label(), f = function(rctx, a)
@@ -269,8 +264,6 @@ function route_myhello_start(t, ctx)
             return msg
         end
     end})
-
-    return fgen
 end
 ```
 
@@ -318,14 +311,12 @@ local function route_direct_f(rctx, handle)
     end
 end
 
-function route_direct_start(t, ctx)
-    local fgen = mcp.funcgen_new()
+function route_direct_start(t, ctx, fgen)
     -- t.child has been translated into something we can use here.
     -- At this point we reference it into a handle we can later route to.
     -- Handles must be generated once and are reused for every slot generated.
     local handle = fgen:new_handle(t.child)
     fgen:ready({ a = handle, n = ctx:label(), f = route_direct_f })
-    return fgen
 end
 ```
 
