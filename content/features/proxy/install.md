@@ -89,10 +89,13 @@ To download and compile Memcached with its proxy features enabled, follow these 
     - proxy_arg:           string to pass to lua library
     ```
     
-1. Download the route library:
+1. [Optionally] Download the route library:
+
+    Memcached ships with `routelib` built in. If you want to modify this base
+library or use a newer version than what was provided with memcached you may download it yourself.
 
     ```console
     wget https://raw.githubusercontent.com/memcached/memcached-proxylibs/main/lib/routelib/routelib.lua
     ```
 
-1. Move the `routelib.lua` file that you downloaded in the previous step to some permanent place on your file system, and take note of it. You will need to refer to its path when you run the Memcached proxy.
+1. [Optionally] Move the `routelib.lua` file that you downloaded in the previous step to some permanent place on your file system, and take note of it. You will need to refer to its path when you run the Memcached proxy.

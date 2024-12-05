@@ -67,14 +67,6 @@ Because the Memcached built-in proxy is a non-default, compile-time configuratio
 
     Note: For the sake of simplicity and easier cleanup, this quick-start guide doesn't include a `make install` step. If you want to install the proxy-enabled Memcached on this machine, then you can do as a final step at the end of this guide.
 
-## Download the route library
-
-Run the following command:
-
-```
-wget https://raw.githubusercontent.com/memcached/memcached-proxylibs/main/lib/routelib/routelib.lua
-```
-
 ## Configure the proxy
     
 To create a minimal proxy configuration file named `config.lua`, run the following command:
@@ -113,10 +105,10 @@ routes{
     ./memcached -l localhost -p 11213 &
     ```
     
-1. Launch a third Memcached server in proxy mode, by specifying the proxy-specific configuration files that you downloaded and created, respectively, in previous steps:
+1. Launch a third Memcached server in proxy mode, by specifying the proxy-specific configuration file that you created, in previous steps:
 
     ```
-    ./memcached -l localhost -p 11211 -o proxy_config=routelib.lua,proxy_arg=config.lua &
+    ./memcached -l localhost -p 11211 -o proxy_config=routelib,proxy_arg=config.lua &
     ```
 
 ## Connect to and use the proxy    
