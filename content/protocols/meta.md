@@ -39,7 +39,7 @@ get request:
  mg foo t f v\r\n
 
 response:
- VA 2 s2 t78 f1\r\n
+ VA 2 t78 f1\r\n
  hi\r\n
 
 delete request:
