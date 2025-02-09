@@ -27,7 +27,8 @@ the new commands.
 
 ## Command Basics
 
-Commands have a basic request/response headers which look like:
+Commands and responses start with a two character code then a set of flags, and
+potentially value data. Flags may have token data attached to them.
 ```
 set request:
  ms foo 2 T90 F1\r\n
@@ -43,7 +44,7 @@ response:
  hi\r\n
 
 delete request:
- md foo I\r\n
+ md foo\r\n
 
 response:
  HD\r\n
@@ -63,29 +64,40 @@ documentation.
 
 Standard GET:
 
-`mg foo t f v`
+```
+mg foo f v\r\n -- ask for client flags, value
+VA 2 f30\r\n -- get length, client flags, value
+hi\r\n
+```
+
+... will return client flags, value. Add `k` to also get the key back.
 
 GETS (get with CAS):
 
-`mg foo t f c v`
+```
+mg foo f c v\r\n
+VA 2 f30 c3\r\n -- also gets the CAS value back
+hi\r\n
+```
 
 TOUCH (just update TTL, no response data):
 
-`mg foo T30`
-
-... will update the TTL to be 30 seconds from now.
+```
+mg foo T30\r\n -- update the TTL to be 30 seconds from now.
+HD\r\n -- no flags or value requested, get HD return code
+```
 
 GAT (get and touch):
 
-`mg foo t f v T90`
+`mg foo f v T90`
 
-... will fetch standard data and update the TTL to be 90 seconds from now.
+... will fetch client flags, value and update the TTL to be 90 seconds from now.
 
 GATS (get and touch with CAS):
 
-`mg foo t f c v T100`
+`mg foo f c v T100`
 
-... same as above, but also gets the CAS value for later use.
+... same as above, but also gets the CAS value.
 
 ## New MetaData Flags
 
@@ -380,7 +392,138 @@ pipeline a bunch of sets together but don't want all of the "ST" code
 responses, pass the 'q' flag with it. If a set results in a code other than
 "ST" (ie; "EX" for a failed CAS), the response will still be returned.
 
-Any syntax errors will still result in a response as well (CLIENT_ERROR).
+Any syntax errors will still result in a response as well (`CLIENT_ERROR`).
+
+## Data consistency with CAS overrides
+
+### Data version or time based consistency
+
+After version 1.6.27 the meta protocol supports directly providing a CAS value
+during mutation operations. By default the CAS value (or CAS id) for an item
+is generated directly by memcached using a globally incrementing counter, but
+we can now override this with the `E` flag.
+
+For example, if the data you are caching has a "version id" or "row version"
+we can provide that:
+
+```
+ms foo 2 E73 -- directly provide the CAS value
+hi
+HD
+mg foo c v -- later able to retrieve it
+VA 2 c73
+hi
+```
+
+We have directly set this value's CAS id to `73`. Now we can use standard CAS
+operations to update the data. For example, attempting to update the data with
+an older version will now fail:
+
+```
+ms foo 2 C72 E73
+hi
+EX
+```
+
+The above could be the result of a race condition: two proceses are trying to
+move the data from version 72 to 73 at the same time. Since the underlying
+version is already 73, the second command will fail.
+
+Note that any command which can generate a new cas id also accepts the `E`
+flag. IE: delete with invalidate, ma for incr/decr, and so on.
+
+#### Time and types
+
+Anything that fits in an 8 byte _incrementing_ number can be used as a CAS id:
+versions, clocks, HLC's, and so on. So long as the next number is higher than
+the previous number.
+
+### Data consistency across multiple pools
+
+If you are attempting to keep multiple pools of memcached servers in sync, we
+can use the CAS override to help improve our consistency results. Please note
+this system is not strict.
+
+#### Leader and follower pools
+
+Assume you have pools A, B, C, and one pool is designated as a "leader", we
+can provide general consistency which can be also be repaired:
+
+```
+-- against pool A:
+mg foo c v\r\n
+VA 2 C50\r\n
+hi\r\n
+-- we fetched a value. we have a new row version (or timestamp):
+ms foo 2 C50 E51\r\n
+ih\r\n
+HD\r\n
+-- Success. Now, against pools B and C we issue "blind sets":
+-- pool B:
+ms foo 2 E51\r\n
+ih\r\n
+HD\r\n
+-- pool C:
+ms foo 2 E51\r\n
+ih\r\n
+HD\r\n
+```
+
+If all is well all copies will have the same CAS ID as data in pool A. This is
+again, not strict, but can help verify if data is consistent or not. If the
+data in pool A has gone missing, you can decide on quorum or highest ID to
+repair data from B/C. Or simply not allow data to change until A has been
+repaired, but in the meantime data can be read from B/C.
+
+#### Full cross consistency
+
+It is difficult if not impossible to guarantee consistency across multiple
+pools. You can attempt this by:
+
+```
+-- against pool A:
+mg foo c v\r\n -- if we need the value. else drop the v.
+-- against pools B/C:
+mg foo c\r\n -- don't necessarily need the value
+-- use the same set command across all three hosts:
+ms foo 2 Cnnnn E90\r\n
+hi\r\n
+```
+
+If this fails on any host, do the whole routine again. If a value is being
+frequently updated this can be problematic or permanently blocking.
+
+You can augment this with the stale/win flags by picking a "leader" pool and
+issuing an invalidation:
+
+```
+md foo I E74\r\n -- invalidate the key if it exists, prep it for the new ver
+HD\r\n
+mg foo c v\r\n
+VA 2 c75 X W\r\n -- data is stale (X) and we atomically win (W)
+hi\r\n
+```
+
+Now this client has the exclusive right to update this value across all pools.
+If updates to pools B/C end up coming _out of order_ the highest CAS value
+should eventually succeed if the updates are asynchronous:
+
+- If pool B starts at version 70, then gets updated to 75 as above
+- A later update to 73 will fail (CAS too old)
+- If pool C starts at version 70, gets updated to 73, then gets updated to 75
+- The final result will be the correct version
+
+If the client waits for either quorum (2/3 in this case) or all (3/3) hosts to
+respond before responding to its user, the data should be the same.
+
+Problems where this fails should be relatively obscure, for example:
+- Pool A is our leader, we get win flag (W) and successfully update it.
+- We update Pools B, C, but in the meantime pool A has failed.
+- Depending on how new leaders are elected and how long updates take, we can
+  end up with inconsistent data.
+
+In reality host or pool election is slow and cross-stream updates are
+relatively fast, so it should be unusual.
 
 ## Probabilistic Hot Cache
 
