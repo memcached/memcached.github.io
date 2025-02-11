@@ -7,17 +7,17 @@ weight = 1
 ## Troubleshooting Timeouts
 
 Client complaining about "timeout errors", but not sure how to track it down?
-Here's a simple utility for examining your situation.
+This page will guide you through the most common causes.
 
-### First, check listen_disabled_num
+### Check your firewalls
 
-Before you go ahead with troubleshooting, you'll want to telnet to your
-memcached instance and run `stats`, then look for "listen_disabled_num". This
-is a poorly named counter which describes how many times you've reached
-maxconns. Each time memcached hits maxconns it will delay new connections,
-which means you'll possibly get timeouts.
+You may need to tune or disable firewalls that exist between the client and
+memcached. Most firewalls track the connections in use (connection tracking)
+and hitting that limit will often cause timeout errors as existing TCP
+connections are dropped.
 
-Also, disable or tune any firewalls you may have in the way.
+You will have to refer to your firewall vendor's documentation to figure this
+out.
 
 ### Then, carefully check the usual suspects
 
@@ -27,18 +27,12 @@ memcached to disk periodically.
 Is the machine overloaded? 0% CPU idle with a load of 400 and memcached
 probably isn't getting enough CPU time. You can try `nice` or `renice`, or
 just run less on the machine. If you're severely overloaded on CPU, you might
-notice the mc_conn_tester below reporting very high wait times for `set`
+notice the "mc_conn_tester" below reporting very high wait times for `set`
 commands.
-
-Is the memcached server 32bit? 32bit hosts have less memory available to the
-kernel for TCP sockets and friends. We've observed some odd behavior under
-large numbers of open sockets and high load with 32bit systems. Strongly
-consider going 64bit, as it may help some hard to trace problems go away,
-including segfaults due to the 2/4g memory limit.
 
 ### Next, mc_conn_tester.pl
 
-Fetch this:
+Download this perl script:
 
 https://www.memcached.org/files/mc_conn_tester.pl
 
@@ -55,7 +49,7 @@ Options:
 [...etc...]
 ```
 
-This is a minimal utility for testing a quick routine with a memcached
+This is a small utility for testing a quick routine directly against a memcached
 instance. It will connect, attempt a couple sets, attempt a few gets, then loop and
 repeat.
 
@@ -102,7 +96,7 @@ with `Fail:` as usual.
 
 ### You're probably dropping packets.
 
-In most cases, where listen_disabled_num doesn't apply, you're likely dropping
+In many cases, you're likely dropping
 packets for some reason. Either a firewall is in the way and has run out of
 stateful tracking slots, or your network card or switch is dropping packets.
 
@@ -113,7 +107,8 @@ Fail: (timeout: 1) (elapsed: 1.00145602) (conn: 0.00000000) (set: 0.00000000) (g
 ```
 
 ... where `conn:` and the rest are all zero. So the test was not able to
-connect to memcached.
+connect to memcached. You may also see random numbers across conn/set/get
+mixed in with total failures.
 
 On most systems SYN retries are 3 seconds, which is awfully long. Losing a
 single SYN packet will certainly mean a timeout. This is easily proven:
@@ -166,4 +161,4 @@ them here.
 ### But your utility never fails!
 
 Odds are good your client has a bug :( Try reaching out to the client author
-for help.
+for help. If not, please reach out to us for support via github discussions.
