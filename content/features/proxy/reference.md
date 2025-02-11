@@ -49,7 +49,9 @@ The proxy returns the first response that it receives from any pool.
 
 ```lua
 route_allfastest{
-    children = {{<var>}}POOL_LIST_OR_SET_NAME{{</var>}}
+    children = {{<var>}}POOL_LIST_OR_SET_NAME{{</var>}},
+    miss = {{<var>}}MISS_BOOLEAN{{</var>}},
+    wait = {{<var>}}WAIT_FLOAT{{</var>}},
 }
 ```
 
@@ -58,6 +60,9 @@ Replace <var>POOL_LIST_OR_SET_NAME</var> with either one of the following:
 * A bracketed, comma-separated list of of pool names defined in the `pools{}` block of your configuration file—for example, `{ "cust_pool_1", "cust_pool_2" }`.
 
 * The name of a set defined in the `pools{}` block of your configuration file—for example, `"set_cust_pools"`.
+
+* <var>MISS_BOOLEAN</var>: if true, wait until first good (hit) response or all children return
+* <var>WAIT_FLOAT</var>: wait at most this amount of time in seconds before returning the best result we have so far (fractional time allowed)
 
 ### `route_split`
 
@@ -105,6 +110,8 @@ route_failover{
     failover_count = {{<var>}}FAILOVER_COUNT{{</var>}},
     shuffle = {{<var>}}SHUFFLE_BOOLEAN{{</var>}},
     miss = {{<var>}}MISS_BOOLEAN{{</var>}},
+    wait = {{<var>}}WAIT_FLOAT{{</var>}},
+    local_zone = {{<var>}}ZONE_NAME{{</var>}},
 }
 ```
 
@@ -113,11 +120,17 @@ Replace the following:
 * <var>POOL_LIST_OR_SET_NAME</var>: either one of the following:
     * A bracketed, comma-separated list of of pool names defined in the `pools{}` block of your configuration file—for example, `{ "cust_pool_1", "cust_pool_2" }`.
     * The name of a set defined in the `pools{}` block of your configuration file—for example, `"set_cust_pools"`.
+    * See [Prioritize a route using local zones]({{<proxy_base_path>}}configure#zones) - if a zoned pool set is supplied and `local_zone` is configured, the local zone is tried first.
+* <var>LOCAL_ZONE</var>: Override the local zone.
 * <var>FAILOVER_COUNT</var>: the number of times we will try another pool in the list before returning an error.
 * <var>SHUFFLE_BOOLEAN</var>: if true, then the proxy randomizes the list of pools before routing the request. Otherwise, uses the list of pools in the given order.
 * <var>MISS_BOOLEAN</var>: if true, then the proxy treats both misses and errors as failures. Otherwise, the proxy counts only errors as failures.
+* <var>WAIT_FLOAT</var>: wait at most this amount of time in seconds before failing over to the next pool (fractional time allowed)
 
 ### `route_zfailover`
+
+NOTE: This function has been deprecated. Its functionality is available in
+`route_failover` and `route_allfatest`
 
 Routes the request to a named set of pools. You can tune the behavior of this handler by passing in additional arguments.
 

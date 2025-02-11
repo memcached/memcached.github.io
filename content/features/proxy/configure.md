@@ -408,7 +408,7 @@ Doing this involves the following steps:
 
 1. Declare a _local zone_ in your proxy configuration file.
 1. Attach zone labels to the pools within your set definitions.
-1. In your route definitions, invoke a route handler that makes use of zone information. Handlers supporting this typically start with a 'z', like `route_zfailover`
+1. In your route definitions, invoke a route handler that makes use of zone information. Handlers supporting this are noted in their documentation (like `route_failover`)
 
 To declare the local zone and attach zone labels to your defined pools, modify your configuration file's `pools{}` block like this:
 
@@ -434,6 +434,10 @@ The following example excerpt from a proxy configuration file that declares a lo
 
 ```lua
 local_zone("west")
+-- This configures the zone from an environment variable:
+-- local_zone_from_env("ZONE")
+-- This configures the zone by reading a line from a file on disk:
+-- local_zone_from_file("./zonefile.txt")
 
 pools {
     set_main_pools = {
@@ -474,16 +478,16 @@ pools {
 }
 ```
 
-The following proxy configuration excerpt extends the previous example with a `routes{}` block that uses [`route_zfailover`]({{<proxy_base_path>}}reference#route_zfailover).
+The following proxy configuration excerpt extends the previous example with a `routes{}` block that uses [`route_failover`]({{<proxy_base_path>}}reference#route_failover).
 
 ```lua
 routes {
     map = {
-        main = route_zfailover {
+        main = route_failover {
             children = "set_main_pools",
         },
         cust = cmdmap{
-            set = route_zfailover {
+            set = route_failover {
                 children = "set_customer_pools",
             },
         },
