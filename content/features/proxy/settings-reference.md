@@ -35,6 +35,20 @@ compiled with `--enable-proxy-tls` option.
 
 The time, in fractional seconds, before an attempted connection between the proxy and a backend times out.
 
+## <code>backend_depth_limit</code>
+
+<table>
+<tr><th>Type</th><td><code>integer</code></td></tr>
+<tr><th>Default</th><td><code>0</code></td></tr>
+</table>
+
+The maximum number of requests which can be enqueued on a backend before
+fast-failing further requests. This limits memory usage and client delays if a
+backend is having network problems. This should be set to lower than
+`active_req_limit` if used.
+
+If set to `0`, then the proxy does not impose this limit.
+
 ## <code>backend_failure_limit</code>
 
 <table>
