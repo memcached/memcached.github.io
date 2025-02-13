@@ -93,6 +93,6 @@ In advanced use cases, you can modify the route library file, or even replace it
 
 ## Proxy deployment examples
 
-For a selection of example proxy use cases, see [Usage examples]({{<legacy_proxy_base_path>}}examples).
+For a selection of proxy infrastructure use cases, see [Infrastructure examples]({{<proxy_base_path>}}examples).
 
 For a example proxy configuration files, see [Example configuration files]({{<proxy_base_path>}}configure#examples).

@@ -1,5 +1,5 @@
 +++
-title = 'Usage examples'
+title = 'Infrastructure examples'
 date = 2024-09-01T09:08:32-07:00
 weight = 50
 +++
