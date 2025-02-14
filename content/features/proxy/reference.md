@@ -21,6 +21,16 @@ route_direct{
 
 Replace <var>POOL_NAME</var> with the name of a pool defined in the `pools{}` block of your configuration file.
 
+### `route_null`
+
+Immediately returns an empty response, matching the type of request sent to
+it. Get requests result in a `MISS` result. Set requests result in a `NOT_STORED`
+result. Numerical, touch, and delete commands result in `NOT_FOUND`.
+
+```lua
+route_null{}
+```
+
 ### `route_allsync`
 
 Routes the request to a list of pools, in parallel.
@@ -126,6 +136,54 @@ Replace the following:
 * <var>SHUFFLE_BOOLEAN</var>: if true, then the proxy randomizes the list of pools before routing the request. Otherwise, uses the list of pools in the given order.
 * <var>MISS_BOOLEAN</var>: if true, then the proxy treats both misses and errors as failures. Otherwise, the proxy counts only errors as failures.
 * <var>WAIT_FLOAT</var>: wait at most this amount of time in seconds before failing over to the next pool (fractional time allowed)
+
+### `route_ratelim`
+
+NOTE: This route handler is EXPERIMENTAL, and the arguments or behavior may
+change.
+
+This route handler uses a Token Bucket Filter algorithm to rate limit requests
+sent to the child pool. On failure a "null" response is returned (see
+`route_null`)
+
+```lua
+route_ratelim{
+    child = "{{<var>}}POOL_NAME{{</var>}}",
+    limit = {{<var>}}LIMIT{{</var>}},
+    fillrate = {{<var>}}FILLRATE{{</var>}},
+    tickrate = {{<var>}}MILLISECONDS{{</var>}},
+    global = {{<var>}}GLOBAL_BOOLEAN{{</var>}},
+    fail_until_limit = {{<var>}}FAIL_UNTIL_BOOLEAN{{</var>}},
+}
+```
+
+Replace <var>POOL_NAME</var> with the name of a pool defined in the `pools{}` block of your configuration file.
+* <var>LIMIT</var>: The maximum size of the buckets, in requests.
+* <var>FILLRATE</var>: The amount to refill the bucket, after every `fillrate` amount of time has passed.
+* <var>TICKRATE</var>: The amount of time, in milliseconds, between each refill of the bucket.
+* <var>GLOBAL_BOOLEAN</var>: By default one bucket is created for every worker
+  thread the proxy is configured for. With this option set to true, this limit
+is global to the whole process, at the expense of being slower. In this case
+the bucket data structure is covered by a single mutex.
+* <var>FAIL_UNTIL_BOOLEAN</var>: With this set to true, the limiter will
+  instead fail until the rate limit has been exceeded. This can be used to
+automatically enable a proxy-local data cache when the server is busy.
+
+### `route_random`
+
+Routes to a random pool from the list of children.
+
+```lua
+route_random{
+    children = {{<var>}}POOL_LIST_OR_SET_NAME{{</var>}},
+}
+```
+
+Replace <var>POOL_LIST_OR_SET_NAME</var> with either one of the following:
+
+* A bracketed, comma-separated list of of pool names defined in the `pools{}` block of your configuration file—for example, `{ "cust_pool_1", "cust_pool_2" }`.
+
+* The name of a set defined in the `pools{}` block of your configuration file—for example, `"set_cust_pools"`.
 
 ### `route_zfailover`
 
