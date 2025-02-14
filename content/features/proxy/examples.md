@@ -7,7 +7,7 @@ This page includes configuration files for common use cases.
 
 For several more examples demonstrating various circumstances and topologies, see [the `examples` directory in the route library source](https://github.com/memcached/memcached-proxylibs/tree/main/lib/routelib/examples)
 
-### Basic consistent hashing to pool of servers
+## Basic consistent hashing to pool of servers
 
 ```lua
 -- Minimal configuration.
@@ -28,7 +28,7 @@ routes{
 }
 ```
 
-### Basic replication for availability or speed
+## Basic replication for availability or speed
 
 Please see
 [REPLICATE.md](https://github.com/memcached/memcached-proxylibs/blob/main/lib/routelib/REPLICATE.md)
@@ -65,7 +65,7 @@ routes{
 }
 ```
 
-### Prefix router
+## Prefix router
 
 ```lua
 -- In this example we logically split our cache where by default keys are
@@ -119,7 +119,7 @@ routes{
 }
 ```
 
-### Command map
+## Command map
 
 ```lua
 -- if you don't want to route based on prefix, but instead just based on the
@@ -150,7 +150,7 @@ routes{
 }
 ```
 
-### Route by listener port with tags
+## Route by listener port with tags
 
 ```lua
 -- it's possible to have different route trees based on the listener port.
@@ -203,7 +203,7 @@ routes{
 }
 ```
 
-### Nested route handlers
+## Nested route handlers
 
 ```lua
 -- A route handler can accept another route handler for any child type entry.
