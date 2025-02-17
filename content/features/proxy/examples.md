@@ -241,3 +241,45 @@ routes{
     },
 }
 ```
+
+## Request logging
+
+Results of requests to backend pools can be selectively enabled in the
+configuration. Logs can then be viewed by connecting and running `watch
+proxyreqs` - Log lines are not generated internally a connection is reading
+them, but it is still recommended to configure the `rate` option or other
+constraints.
+
+Logs look like: `ts=time gid=num type=proxy_req elapsed=us type=num
+code=num status=num res=num cfd=fdnum be=host:port detail=tag req=get key\n`
+
+```lua
+settings{
+    backend_options = {
+        log = {
+            rate = 5, -- log one out of every 5 by random chance
+            errors = true, -- log all errors
+            deadline = 250, -- log all results slower than 250ms
+            tag = "all" -- informational tag for log
+        }
+    }
+}
+
+pools{
+    main = {
+        -- per-pool logging options.
+        --[[backend_options = {
+            -- if no constraints given, log everything (SLOW!)
+            log = { tag = "mainpool" }
+        },--]]
+        backends = {
+            "127.0.0.1:11214",
+            "127.0.0.1:11215",
+        }
+    }
+}
+
+routes{
+    default = route_direct{ child = "main" }
+}
+```
