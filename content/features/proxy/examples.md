@@ -9,11 +9,11 @@ For several more examples demonstrating various circumstances and topologies, se
 
 ## Basic consistent hashing to pool of servers
 
-```lua
--- Minimal configuration.
--- No high level routing: just hash keys against the pool's list of backends.
--- This should be equivalent to a standard memcached client.
+Minimal configuration.
+No high level routing: just hash keys against the pool's list of backends.
+This should be equivalent to a standard memcached client.
 
+```lua
 pools{
     main = {
         backends = {
@@ -67,11 +67,11 @@ routes{
 
 ## Prefix router
 
-```lua
--- In this example we logically split our cache where by default keys are
--- spread across a pool of servers to maximize available memory. Then, a small
--- set of highly accessed "hot" keys are replicated across multiple servers
+In this example we logically split our cache where by default keys are
+spread across a pool of servers to maximize available memory. Then, a small
+set of highly accessed "hot" keys are replicated across multiple servers
 
+```lua
 pools{
     main = {
         backends = {
@@ -121,9 +121,10 @@ routes{
 
 ## Command map
 
+If you don't want to route based on prefix, but instead just based on the
+command used, replace map with cmap when building routes{}
+
 ```lua
--- if you don't want to route based on prefix, but instead just based on the
--- command used, replace map with cmap when building routes{}
 pools{
     foo = {
         backends = {
@@ -152,15 +153,16 @@ routes{
 
 ## Route by listener port with tags
 
+It's possible to have different route trees based on the listener port.
+this is useful if you want to route to different pools by port alone, or
+have different prefix trees for different services.
+
+memcached must be started with options like:
+-l 127.0.0.1:12051 -l tag_b_:127.0.0.1:12052 -l tag_cccc_:127.0.0.1:12053
+this gives a default listener on 12051, "b" tag for 12052, and "cccc" tag
+for 12053.
+
 ```lua
--- it's possible to have different route trees based on the listener port.
--- this is useful if you want to route to different pools by port alone, or
--- have different prefix trees for different services.
---
--- memcached must be started like:
--- -l 127.0.0.1:12051 -l tag_b_:127.0.0.1:12052 -l tag_cccc_:127.0.0.1:12053
--- this gives a default listener on 12051, "b" tag for 12052, and "cccc" tag
--- for 12053.
 pools{
     foo = {
         backends = {
@@ -205,9 +207,10 @@ routes{
 
 ## Nested route handlers
 
+A route handler can accept another route handler for any child type entry.
+This lets you freely compose complex behaviors from simpler route handlers.
+
 ```lua
--- A route handler can accept another route handler for any child type entry.
--- This lets you freely compose complex behaviors from simpler route handlers.
 pools{
     one = {
         backends = {
