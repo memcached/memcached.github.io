@@ -3,7 +3,7 @@ title = 'Loki with Extstore'
 date = 2024-09-04T14:58:37-07:00
 +++
 
-## Granfa Loki with Extstore
+## Grafana Loki with Extstore
 
 You may have seen this excellent blog post: https://grafana.com/blog/2023/08/23/how-we-scaled-grafana-cloud-logs-memcached-cluster-to-50tb-and-improved-reliability/
 
