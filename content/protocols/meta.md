@@ -267,7 +267,7 @@ request:
  ms foo S3 T360 C777 I\r\n
  new\r\n
 response:
- ST\r\n
+ HD\r\n
 ```
 
 The next metaget will continue to see the item as stale, with its previous
