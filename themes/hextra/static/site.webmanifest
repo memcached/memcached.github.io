@@ -1,6 +1,6 @@
 {
-  "name": "Hextra",
-  "short_name": "Hextra",
+  "name": "Memcached Documentation",
+  "short_name": "Memcached",
   "start_url": "index.html",
   "icons": [
     {
