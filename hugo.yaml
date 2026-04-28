@@ -2,6 +2,10 @@ baseURL: https://example.org/
 languageCode: en-us
 title: Memcached Documentation
 theme: hextra
+params:
+  navbar:
+    displayTitle: true
+    displayLogo: false
 menu:
   main:
     - name: Home
