@@ -5,7 +5,9 @@ theme: hextra
 params:
   navbar:
     displayTitle: true
-    displayLogo: false
+    displayLogo: true
+    logo:
+      path: images/memcached_link_125.png
 menu:
   main:
     - name: Home
