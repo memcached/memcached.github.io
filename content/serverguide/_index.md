@@ -90,10 +90,9 @@ helm repo update
 helm install memcached helmforge/memcached -f values.yaml
 ```
 
-Memcached does not replicate entries between servers. In this setup each pod is
-an independent memcached server, and the application client is responsible for
-choosing a server for each key. Use a client library that supports multiple
-servers, ideally with consistent hashing.
+Kubernetes may replace pods or nodes during upgrades, scheduling changes, or
+failures. Prefer client configurations that use consistent hashing so pool
+membership changes disrupt fewer cached keys.
 
 With the release name above, clients that need explicit pool members can use the
 headless Service names:
