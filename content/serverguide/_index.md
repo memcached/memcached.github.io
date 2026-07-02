@@ -69,6 +69,44 @@ make && make test && sudo make install
 
 See `./configure --help` for full options.
 
+### On Kubernetes with Helm
+
+One Kubernetes option is the HelmForge chart. For a standard memcached pool,
+start several independent servers and configure the application client to spread
+keys across all of them.
+
+For example, this starts three memcached servers:
+
+```yaml
+architecture: distributed
+replicaCount: 3
+```
+
+Install it with Helm:
+
+```
+helm repo add helmforge https://repo.helmforge.dev
+helm repo update
+helm install memcached helmforge/memcached -f values.yaml
+```
+
+Memcached does not replicate entries between servers. In this setup each pod is
+an independent memcached server, and the application client is responsible for
+choosing a server for each key. Use a client library that supports multiple
+servers, ideally with consistent hashing.
+
+With the release name above, clients that need explicit pool members can use the
+headless Service names:
+
+```
+memcached-0.memcached-headless:11211
+memcached-1.memcached-headless:11211
+memcached-2.memcached-headless:11211
+```
+
+See the [HelmForge memcached chart](https://github.com/helmforgedev/charts/tree/main/charts/memcached)
+for chart values and production notes.
+
 ### Install a client
 
 Memcached on its own is just a key/value storage daemon. Installing it does
