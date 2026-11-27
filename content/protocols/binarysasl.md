@@ -145,7 +145,7 @@ saslpasswd2 -a memcached -c cacheuser
 
 In order to enable SASL support in the server you must use the `-S` flag.
 
-The `-S` flag does a few things things:
+The `-S` flag does a few things:
 
 * Enable all of the SASL commands.
 * Require binary protocol _only_.
